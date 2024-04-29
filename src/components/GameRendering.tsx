@@ -1,41 +1,34 @@
 import PlayerObj from "./PlayerObj";
 import InputController from "./InputController";
-// import { globalAudioBuffer, globalAudioHTMLElement, globalAudioIsPlaying, globalCanvas, globalCanvasCtx, globalDoneInitializing, globalLevelData, globalEnemyPositionList, globalPlatformY, globalScoreSet, handleAudioUpload, } from "./GlobalGameLogic";
 import EnemyObj from "./EnemyObj";
+import { ChangeEvent } from "react";
+
 
 export let globalCanvas: HTMLCanvasElement;
 export let globalCanvasCtx: CanvasRenderingContext2D;
 export let globalEnemyPositionList: { x: number; y: number }[];
-
-export let globalScoreSet: Set<string> = new Set();
 export const globalGravity: number = 0.8;
 export let globalLevelData: { x: number; y: number }[];
-
 export let globalPlatformY: number;
-
-export let globalDoneInitializing: boolean = false;
-
-export let globalAudioBuffer: AudioBuffer;
-let globalAudioContext: AudioContext;
-export let globalAudioHTMLElement: HTMLMediaElement;
-export let globalAudioIsPlaying: boolean = false;
-
-
-
-export let globalRenderX: number;
 export let globalPreviousRenderX: number;
+export let globalRenderX: number;
+export let globalScoreSet: Set<string> = new Set();
+
+let globalAudioBuffer: AudioBuffer;
+let globalAudioContext: AudioContext;
+let globalAudioHTMLElement: HTMLMediaElement;
+let globalAudioIsPlaying: boolean = false;
 let globalEnemySpawnedList: EnemyObj[] = [];
+let globalEnemySpawnInterval: number;
 let globalEnemyTimer = 0;
 let globalEnemyTimerPausedState = 0;
-let globalEnemySpawnInterval;
+
 
 export default function Game() {
 
-  window.onload = () => {
-    document.getElementById("audioFile")?.addEventListener("change", handleAudioUpload);
-  }
-
-  function handleAudioUpload(event: Event): void {
+  function handleAudioUpload(event: Event | ChangeEvent): void {
+    console.log("handle audio")
+    console.log(typeof(globalEnemySpawnInterval));
     let blob: any = window.URL || window.webkitURL;
     const file: any = (event.target as HTMLInputElement)?.files?.[0];
     const fileUrl: string = blob.createObjectURL(file);
@@ -52,7 +45,6 @@ export default function Game() {
 
 
   function initializeAudioTrack(bufferedAudioArray: ArrayBuffer): void {
-    // globalAudioContext = new (window.AudioContext || window.webkitAudioContext)();
     globalAudioContext = new window.AudioContext();
     globalAudioHTMLElement = document.getElementById("audioSource") as HTMLMediaElement;
     const track = globalAudioContext.createMediaElementSource(globalAudioHTMLElement);
@@ -108,7 +100,6 @@ export default function Game() {
       const posX = (i / samplesCount) * levelWidth;
       const posY = Math.floor(sample * levelHeight) / 2;
       if (posY > 200) {
-        // 50 is currently arbitrary representation of final enemy height.
         globalEnemyPositionList.push({ x: posX, y: globalPlatformY - 50 });
       }
       globalLevelData.push({ x: posX, y: levelHeight - posY });
@@ -142,7 +133,7 @@ export default function Game() {
 
     requestAnimationFrame(gameLoop);
 
-    function gameLoop(timestamp: number) {
+    function gameLoop(timestamp: number): void {
       checkEnemySpawn();
       if (globalAudioIsPlaying) {
         deltaTime = timestamp - previousTime;
@@ -167,8 +158,8 @@ export default function Game() {
       globalCanvasCtx.clearRect(0, 0, globalCanvas.width, globalCanvas.height);
       globalCanvasCtx.beginPath();
 
-      const colorIndex = Math.floor((globalRenderX / globalLevelData.length) * 255);
-      const color = `rgb(${colorIndex}, ${(255 - colorIndex)}, ${(128 + colorIndex)})`;
+      const colorIndex: number = Math.floor((globalRenderX / globalLevelData.length) * 255);
+      const color: string = `rgb(${colorIndex}, ${(255 - colorIndex)}, ${(128 + colorIndex)})`;
       globalCanvasCtx.strokeStyle = color;
 
       globalCanvasCtx.moveTo(globalLevelData[0].x - globalRenderX, globalLevelData[0].y);
@@ -181,12 +172,11 @@ export default function Game() {
     function updateRenderX(): void {
       if (globalRenderX < globalLevelData.length) {
         // visual Offset milliseconds may need to be adjusted if sprite ever moves. 
-        const visualOffsetInMs = 700;
-        const progressPercentage = globalAudioHTMLElement.currentTime / globalAudioBuffer.duration;
-        const audioTimeVis = progressPercentage * globalLevelData[globalLevelData.length - 1].x;
-        const offsetAudioTime = audioTimeVis - visualOffsetInMs;
+        const visualOffsetInMs: number = 700;
+        const progressPercentage: number = globalAudioHTMLElement.currentTime / globalAudioBuffer.duration;
+        const audioTimeVis: number = progressPercentage * globalLevelData[globalLevelData.length - 1].x;
+        const offsetAudioTime: number = audioTimeVis - visualOffsetInMs;
         globalPreviousRenderX = globalRenderX;
-        // using Math.max to ensure that the value does not reverse in the event of it being negative
         globalRenderX = Math.max(offsetAudioTime, 0);
       }
     }
@@ -212,8 +202,6 @@ export default function Game() {
         globalCanvasCtx.font = "20px Arial";
         globalCanvasCtx.textAlign = "center";
         globalCanvasCtx.fillText(`Your score: ${player1.score} `, globalCanvas.width / 2, (globalCanvas.height / 2));
-        // you win!
-        // your score is: 
       }
     }
 
@@ -286,18 +274,13 @@ export default function Game() {
     <>
       <h1>Rhythm Runner</h1>
 
-      <input type="file" accept="audio/*" id="audioFile"></input>
-      <p id="fileUploadError"></p>
-      <audio id="audioSource" src="sample-audio.mp3"></audio>
+      <input type="file" accept="audio/*" id="audioFile" onChange={handleAudioUpload}></input>
+      <audio id="audioSource"></audio>
 
       <button id="playButton" data-playing="false" role="switch" aria-checked="false">
         <span>Play/Pause</span>
       </button>
-
-      <button id="debugAudioFrameButton">
-        <span>Debug Audio Frame</span>
-      </button>
-
+      <br /><br />
       <canvas id="playArea" width="800" height="600"></canvas>
     </>
   )

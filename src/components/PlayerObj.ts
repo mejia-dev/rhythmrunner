@@ -1,5 +1,5 @@
 import InputController from "./InputController";
-import { globalCanvasCtx, globalGravity, globalPlatformY, globalScoreSet } from "./Game";
+import { globalCanvasCtx, globalGravity, globalPlatformY, globalScoreSet } from "./GlobalGameLogic";
 
 
 export default class PlayerObj {

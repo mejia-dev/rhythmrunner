@@ -1,5 +1,4 @@
-import { globalCanvasCtx, globalLevelData } from "./GlobalGameLogic";
-import { globalRenderX, globalPreviousRenderX } from "./GameRendering";
+import { globalCanvasCtx, globalLevelData, globalRenderX, globalPreviousRenderX } from "./GameRendering";
 
 export default class EnemyObj {
   id: string;

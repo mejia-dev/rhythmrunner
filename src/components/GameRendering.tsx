@@ -26,6 +26,9 @@ let globalEnemyTimerPausedState = 0;
 
 export default function Game() {
 
+  console.log(typeof(window.URL));
+  console.log(typeof(window.webkitURL));
+
   function handleAudioUpload(event: Event | ChangeEvent): void {
     const blob: any = window.URL || window.webkitURL;
     const file: File | undefined = (event.target as HTMLInputElement)?.files?.[0];
@@ -206,7 +209,7 @@ export default function Game() {
       if (player1.lives <= 0) {
         globalAudioHTMLElement.pause();
         globalAudioIsPlaying = false;
-        globalEnemySpawnInterval = 0;
+        if (globalEnemySpawnInterval) globalEnemySpawnInterval = 0;
         globalCanvasCtx.fillStyle = "white";
         globalCanvasCtx.font = "40px Arial";
         globalCanvasCtx.textAlign = "center";

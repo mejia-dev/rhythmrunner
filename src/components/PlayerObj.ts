@@ -1,9 +1,7 @@
 import InputController from "./InputController";
-import { globalCanvasCtx, globalGravity, globalPlatformY, globalScoreSet } from "./GlobalGameLogic";
-
+import { globalCanvasCtx, globalGravity, globalPlatformY, globalScoreSet } from "./GameRendering";
 
 export default class PlayerObj {
-
   inputController: InputController
   width: number;
   height: number;
@@ -56,7 +54,6 @@ export default class PlayerObj {
         this.canDoubleJump = true;
       }
     }
-
     if (this.inputController.jump.pressed && this.velocity.y > 0 && this.canDoubleJump) {
       this.velocity.y = -this.jumpHeight;
       this.canDoubleJump = false;
@@ -76,7 +73,7 @@ export default class PlayerObj {
     }
   }
 
-  updateScore() {
+  updateScore(): void {
     this.score = globalScoreSet.size;
   }
 

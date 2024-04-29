@@ -12,7 +12,7 @@ export let globalLevelData: { x: number; y: number }[];
 export let globalPlatformY: number;
 export let globalPreviousRenderX: number;
 export let globalRenderX: number;
-export let globalScoreSet: Set<string> = new Set();
+export const globalScoreSet: Set<string> = new Set();
 
 let globalAudioBuffer: AudioBuffer;
 let globalAudioContext: AudioContext;
@@ -27,10 +27,8 @@ let globalEnemyTimerPausedState = 0;
 export default function Game() {
 
   function handleAudioUpload(event: Event | ChangeEvent): void {
-    console.log("handle audio")
-    console.log(typeof(globalEnemySpawnInterval));
-    let blob: any = window.URL || window.webkitURL;
-    const file: any = (event.target as HTMLInputElement)?.files?.[0];
+    const blob: any = window.URL || window.webkitURL;
+    const file: File | undefined = (event.target as HTMLInputElement)?.files?.[0];
     const fileUrl: string = blob.createObjectURL(file);
     const audioElement: HTMLMediaElement = document.getElementById("audioSource") as HTMLMediaElement;
     audioElement.src = fileUrl;
@@ -40,7 +38,7 @@ export default function Game() {
       const bufferedAudioArray: ArrayBuffer = this.result as ArrayBuffer;
       initializeAudioTrack(bufferedAudioArray);
     };
-    fileReader.readAsArrayBuffer(file);
+    if (file) fileReader.readAsArrayBuffer(file);
   }
 
 
@@ -107,7 +105,6 @@ export default function Game() {
   }
 
   function startCanvas(): void {
-    console.log("recevs")
     globalEnemySpawnInterval = setInterval(() => {
       globalEnemyTimer++;
     }, 1000);
@@ -209,6 +206,7 @@ export default function Game() {
       if (player1.lives <= 0) {
         globalAudioHTMLElement.pause();
         globalAudioIsPlaying = false;
+        globalEnemySpawnInterval = 0;
         globalCanvasCtx.fillStyle = "white";
         globalCanvasCtx.font = "40px Arial";
         globalCanvasCtx.textAlign = "center";
@@ -227,7 +225,7 @@ export default function Game() {
         globalEnemyTimer = 0;
         globalEnemyPositionList.forEach(kvp => {
           if (kvp.x >= globalRenderX && kvp.x <= globalRenderX + globalCanvas.width) {
-            let newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50);
+            const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50);
             globalEnemySpawnedList.push(newEnemy);
           }
         });
@@ -251,7 +249,6 @@ export default function Game() {
       });
     }
 
-
     function drawHUD(): void {
       globalCanvasCtx.fillStyle = "white";
       globalCanvasCtx.font = "20px Arial";
@@ -261,8 +258,6 @@ export default function Game() {
       
     }
 
-
-    // this function draws the platform.
     function drawPlatform(): void {
       globalCanvasCtx.fillStyle = "green";
       globalCanvasCtx.fillRect(0, globalPlatformY, globalCanvas.width, 10);

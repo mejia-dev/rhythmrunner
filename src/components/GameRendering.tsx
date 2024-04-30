@@ -123,7 +123,7 @@ export default function Game() {
     const p1InputController: InputController = new InputController();
     const player1: PlayerObj = new PlayerObj(p1InputController);
 
-    player1.position.x = globalCanvas.width / 2 - 50;
+    player1.position.x = globalCanvas.width / 2 - 200;
 
     const targetFPS: number = 60;
     const frame_interval: number = 1000 / targetFPS;
@@ -138,9 +138,7 @@ export default function Game() {
       if (globalAudioIsPlaying) {
         deltaTime = timestamp - previousTime;
         deltaTimeMultiplier = deltaTime / frame_interval;
-
-
-        globalCanvasCtx.clearRect(0, 0, globalCanvas.width, globalCanvas.height);
+        resetCanvas()
         drawLevel(deltaTimeMultiplier);
         player1.requestUpdate(deltaTimeMultiplier);
         updateSpawnedEnemies(deltaTimeMultiplier);
@@ -154,10 +152,14 @@ export default function Game() {
       requestAnimationFrame(gameLoop);
     }
 
-    function drawLevel(deltaTimeMultiplier: number): void {
+    function resetCanvas(): void {
       globalCanvasCtx.clearRect(0, 0, globalCanvas.width, globalCanvas.height);
-      globalCanvasCtx.beginPath();
+      globalCanvasCtx.fillStyle = "black";
+      globalCanvasCtx.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
+    }
 
+    function drawLevel(deltaTimeMultiplier: number): void {
+      globalCanvasCtx.beginPath();
       const colorIndex: number = Math.floor((globalRenderX / globalLevelData.length) * 255);
       const color: string = `rgb(${colorIndex}, ${(255 - colorIndex)}, ${(128 + colorIndex)})`;
       globalCanvasCtx.strokeStyle = color;

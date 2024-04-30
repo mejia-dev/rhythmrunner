@@ -64,15 +64,18 @@ export default function Game() {
       if (globalAudioContext.state === "suspended") {
         globalAudioContext.resume();
         globalAudioIsPlaying = true;
+        globalCanvas.focus();
       }
       if (playButton.dataset.playing === "false") {
         globalAudioHTMLElement.play();
         globalAudioIsPlaying = true;
         playButton.dataset.playing = "true";
+        globalCanvas.focus();
       } else if (playButton.dataset.playing === "true") {
         globalAudioHTMLElement.pause();
         globalAudioIsPlaying = false;
         playButton.dataset.playing = "false";
+        globalCanvas.focus();
       }
     },
       false,
@@ -308,7 +311,7 @@ export default function Game() {
         <br /><br />
       </div>
 
-      <canvas id="playArea" width="800" height="600"></canvas>
+      <canvas id="playArea" width="800" height="600" tabIndex={0} />
     </>
   )
 }

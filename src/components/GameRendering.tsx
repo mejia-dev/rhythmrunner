@@ -27,7 +27,7 @@ export default function Game() {
   let globalEnemyTimer = 0;
   let globalEnemyTimerPausedState = 0;
 
-  const [loading, setLoading] = useState<Boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   function handleAudioUpload(event: Event | ChangeEvent): void {
     setLoading(true);
@@ -276,7 +276,7 @@ export default function Game() {
     <>
       <h1>Rhythm Runner</h1>
       <hr />
-      
+
       <div id="gameSetup">
         <p>Upload an audio file to begin:</p>
         <input

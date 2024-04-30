@@ -262,8 +262,8 @@ export default function Game() {
     }
 
     function drawPlatform(): void {
-      globalCanvasCtx.fillStyle = "green";
-      globalCanvasCtx.fillRect(0, globalPlatformY, globalCanvas.width, 10);
+      globalCanvasCtx.fillStyle = "white";
+      globalCanvasCtx.fillRect(0, globalPlatformY, globalCanvas.width, 5);
     }
 
   }

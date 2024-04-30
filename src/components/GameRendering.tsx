@@ -2,7 +2,7 @@ import PlayerObj from "./PlayerObj";
 import InputController from "./InputController";
 import EnemyObj from "./EnemyObj";
 import { ChangeEvent, useState } from "react";
-
+import deathSound from "../assets/audio/492651__rvgerxini__power-down.mp3";
 
 export let globalCanvas: HTMLCanvasElement;
 export let globalCanvasCtx: CanvasRenderingContext2D;
@@ -233,7 +233,7 @@ export default function Game() {
         globalCanvasCtx.fillStyle = "white";
         globalCanvasCtx.font = "40px Audiowide";
         globalCanvasCtx.textAlign = "center";
-        globalCanvasCtx.fillText("You Win!", globalCanvas.width / 2, (globalCanvas.height / 2) - 40);
+        globalCanvasCtx.fillText("You Win", globalCanvas.width / 2, (globalCanvas.height / 2) - 40);
         globalCanvasCtx.fillStyle = "white";
         globalCanvasCtx.font = "20px Audiowide";
         globalCanvasCtx.textAlign = "center";
@@ -250,6 +250,8 @@ export default function Game() {
         globalCanvasCtx.font = "40px Audiowide";
         globalCanvasCtx.textAlign = "center";
         globalCanvasCtx.fillText("You Lose", globalCanvas.width / 2, globalCanvas.height / 2);
+        const loseSound: HTMLAudioElement = new Audio(deathSound);
+        loseSound.play();
       }
     }
 

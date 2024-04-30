@@ -1,5 +1,9 @@
 import InputController from "./InputController";
 import { globalCanvasCtx, globalGravity, globalPlatformY, globalScoreSet } from "./GameRendering";
+import spritesheet from "../assets/img/robo_sprite_sheet.png";
+
+const playerSpriteSheet: HTMLImageElement = new Image();
+playerSpriteSheet.src = spritesheet;
 
 export default class PlayerObj {
   inputController: InputController
@@ -16,7 +20,7 @@ export default class PlayerObj {
 
   constructor(playerInputController: InputController) {
     this.inputController = playerInputController;
-    this.width = 50;
+    this.width = 36;
     this.height = 50;
     this.jumpHeight = 15;
     this.canDoubleJump = false;
@@ -38,8 +42,9 @@ export default class PlayerObj {
       globalCanvasCtx.shadowBlur = 15;
       globalCanvasCtx.shadowColor = "red";
     }
-    globalCanvasCtx.fillStyle = "blue";
-    globalCanvasCtx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    // globalCanvasCtx.fillStyle = "blue";
+    // globalCanvasCtx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    globalCanvasCtx.drawImage(playerSpriteSheet, 0, 0, 52, 72, this.position.x, this.position.y, this.width, this.height)
     globalCanvasCtx.shadowBlur = 0;
   }
 

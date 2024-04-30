@@ -161,6 +161,11 @@ export default function Game() {
       globalAudioColor = `rgb(${colorIndex}, ${(255 - colorIndex)}, ${(128 + colorIndex)})`;
     }
 
+    function drawPlatform(): void {
+      globalCanvasCtx.fillStyle = globalAudioColor;
+      globalCanvasCtx.fillRect(0, globalPlatformY, globalCanvas.width, 3);
+    }
+
     function drawLevel(deltaTimeMultiplier: number): void {
       globalCanvasCtx.beginPath();
       globalCanvasCtx.strokeStyle = globalAudioColor;
@@ -171,16 +176,39 @@ export default function Game() {
       globalCanvasCtx.stroke();
     }
 
-    function updateRenderX(): void {
-      if (globalRenderX < globalLevelData.length) {
-        // visual Offset milliseconds may need to be adjusted if sprite ever moves. 
-        const visualOffsetInMs: number = 700;
-        const progressPercentage: number = globalAudioHTMLElement.currentTime / globalAudioBuffer.duration;
-        const audioTimeVis: number = progressPercentage * globalLevelData[globalLevelData.length - 1].x;
-        const offsetAudioTime: number = audioTimeVis - visualOffsetInMs;
-        globalPreviousRenderX = globalRenderX;
-        globalRenderX = Math.max(offsetAudioTime, 0);
+    function checkEnemySpawn(): void {
+      if (!globalAudioIsPlaying) {
+        globalEnemyTimer = globalEnemyTimerPausedState;
+        return;
       }
+      globalEnemyTimerPausedState = globalEnemyTimer;
+
+      if (globalEnemyTimer === 3) {
+        globalEnemyTimer = 0;
+        globalEnemyPositionList.forEach(kvp => {
+          if (kvp.x >= globalRenderX && kvp.x <= globalRenderX + globalCanvas.width) {
+            const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50);
+            globalEnemySpawnedList.push(newEnemy);
+          }
+        });
+      }
+    }
+
+    function updateSpawnedEnemies(deltaTimeMultiplier: number): void {
+      globalEnemySpawnedList = globalEnemySpawnedList.filter(enemy => !enemy.readyForDeletion);
+      globalEnemySpawnedList.forEach(enemy => {
+        enemy.requestUpdate(deltaTimeMultiplier);
+        if (checkCollision(player1, enemy)) {
+          player1.takeDamage(1);
+          enemy.isAlive = false;
+          enemy.readyForDeletion = true;
+        }
+        if (enemy.position.x < 0 - enemy.width) {
+          globalScoreSet.add(enemy.id)
+          player1.updateScore();
+          enemy.readyForDeletion = true;
+        }
+      });
     }
 
     function checkCollision(
@@ -219,41 +247,6 @@ export default function Game() {
       }
     }
 
-    function checkEnemySpawn(): void {
-      if (!globalAudioIsPlaying) {
-        globalEnemyTimer = globalEnemyTimerPausedState;
-        return;
-      }
-      globalEnemyTimerPausedState = globalEnemyTimer;
-
-      if (globalEnemyTimer === 3) {
-        globalEnemyTimer = 0;
-        globalEnemyPositionList.forEach(kvp => {
-          if (kvp.x >= globalRenderX && kvp.x <= globalRenderX + globalCanvas.width) {
-            const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50);
-            globalEnemySpawnedList.push(newEnemy);
-          }
-        });
-      }
-    }
-
-    function updateSpawnedEnemies(deltaTimeMultiplier: number): void {
-      globalEnemySpawnedList = globalEnemySpawnedList.filter(enemy => !enemy.readyForDeletion);
-      globalEnemySpawnedList.forEach(enemy => {
-        enemy.requestUpdate(deltaTimeMultiplier);
-        if (checkCollision(player1, enemy)) {
-          player1.takeDamage(1);
-          enemy.isAlive = false;
-          enemy.readyForDeletion = true;
-        }
-        if (enemy.position.x < 0 - enemy.width) {
-          globalScoreSet.add(enemy.id)
-          player1.updateScore();
-          enemy.readyForDeletion = true;
-        }
-      });
-    }
-
     function drawHUD(): void {
       globalCanvasCtx.fillStyle = "white";
       globalCanvasCtx.font = "20px Arial";
@@ -261,11 +254,17 @@ export default function Game() {
       globalCanvasCtx.fillText(`Score: ${player1.score}`, 50, 60);
     }
 
-    function drawPlatform(): void {
-      globalCanvasCtx.fillStyle = globalAudioColor;
-      globalCanvasCtx.fillRect(0, globalPlatformY, globalCanvas.width, 3);
+    function updateRenderX(): void {
+      if (globalRenderX < globalLevelData.length) {
+        // visual Offset milliseconds may need to be adjusted if sprite ever moves. 
+        const visualOffsetInMs: number = 700;
+        const progressPercentage: number = globalAudioHTMLElement.currentTime / globalAudioBuffer.duration;
+        const audioTimeVis: number = progressPercentage * globalLevelData[globalLevelData.length - 1].x;
+        const offsetAudioTime: number = audioTimeVis - visualOffsetInMs;
+        globalPreviousRenderX = globalRenderX;
+        globalRenderX = Math.max(offsetAudioTime, 0);
+      }
     }
-
   }
 
   return (

@@ -256,8 +256,11 @@ export default function Game() {
     function drawHUD(): void {
       globalCanvasCtx.fillStyle = "white";
       globalCanvasCtx.font = "20px Audiowide";
-      globalCanvasCtx.fillText(`Lives: ${player1.lives}`, 50, 30);
-      globalCanvasCtx.fillText(`Score: ${player1.score}`, 50, 60);
+      globalCanvasCtx.fillText(`Score: ${player1.score}`, 70, 70);
+      if (player1.lives < 2) {
+        globalCanvasCtx.fillStyle = "red";
+      }
+      globalCanvasCtx.fillText(`Lives: ${player1.lives}`, 70, 40);
     }
 
     function updateRenderX(): void {

@@ -130,7 +130,7 @@ export default function Game() {
     globalCanvasCtx.fillStyle = "black";
     globalCanvasCtx.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
     globalCanvasCtx.fillStyle = "white";
-    globalCanvasCtx.font = "40px Arial";
+    globalCanvasCtx.font = "40px Audiowide";
     globalCanvasCtx.textAlign = "center";
     globalCanvasCtx.fillText("Press Play to Start", globalCanvas.width / 2, globalCanvas.height / 2);
 
@@ -231,11 +231,11 @@ export default function Game() {
     function handleWin(): void {
       if (globalAudioHTMLElement.currentTime >= globalAudioBuffer.duration) {
         globalCanvasCtx.fillStyle = "white";
-        globalCanvasCtx.font = "40px Arial";
+        globalCanvasCtx.font = "40px Audiowide";
         globalCanvasCtx.textAlign = "center";
         globalCanvasCtx.fillText("You Win!", globalCanvas.width / 2, (globalCanvas.height / 2) - 40);
         globalCanvasCtx.fillStyle = "white";
-        globalCanvasCtx.font = "20px Arial";
+        globalCanvasCtx.font = "20px Audiowide";
         globalCanvasCtx.textAlign = "center";
         globalCanvasCtx.fillText(`Your score: ${player1.score} `, globalCanvas.width / 2, (globalCanvas.height / 2));
       }
@@ -247,7 +247,7 @@ export default function Game() {
         globalAudioIsPlaying = false;
         if (globalEnemySpawnInterval) globalEnemySpawnInterval = 0;
         globalCanvasCtx.fillStyle = "white";
-        globalCanvasCtx.font = "40px Arial";
+        globalCanvasCtx.font = "40px Audiowide";
         globalCanvasCtx.textAlign = "center";
         globalCanvasCtx.fillText("You Lose", globalCanvas.width / 2, globalCanvas.height / 2);
       }
@@ -255,7 +255,7 @@ export default function Game() {
 
     function drawHUD(): void {
       globalCanvasCtx.fillStyle = "white";
-      globalCanvasCtx.font = "20px Arial";
+      globalCanvasCtx.font = "20px Audiowide";
       globalCanvasCtx.fillText(`Lives: ${player1.lives}`, 50, 30);
       globalCanvasCtx.fillText(`Score: ${player1.score}`, 50, 60);
     }
@@ -274,9 +274,9 @@ export default function Game() {
 
   return (
     <>
-      <h1>Rhythm Runner</h1>
+      <h1 id="logoText">Rhythm Runner</h1>
       <hr />
-
+      <br />
       <div id="gameSetup">
         <p>Upload an audio file to begin:</p>
         <input

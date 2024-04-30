@@ -4,6 +4,10 @@ import spritesheet from "../assets/img/robo_sprite_sheet.png";
 
 const playerSpriteSheet: HTMLImageElement = new Image();
 playerSpriteSheet.src = spritesheet;
+const spriteHeight: number = 72;
+const spriteWidth: number = 64;
+let animationFrame: number = 0;
+let frameXPos: number = 0;
 
 export default class PlayerObj {
   inputController: InputController
@@ -20,7 +24,7 @@ export default class PlayerObj {
 
   constructor(playerInputController: InputController) {
     this.inputController = playerInputController;
-    this.width = 36;
+    this.width = 47;
     this.height = 50;
     this.jumpHeight = 15;
     this.canDoubleJump = false;
@@ -42,9 +46,13 @@ export default class PlayerObj {
       globalCanvasCtx.shadowBlur = 15;
       globalCanvasCtx.shadowColor = "red";
     }
-    // globalCanvasCtx.fillStyle = "blue";
-    // globalCanvasCtx.fillRect(this.position.x, this.position.y, this.width, this.height);
-    globalCanvasCtx.drawImage(playerSpriteSheet, 0, 0, 52, 72, this.position.x, this.position.y, this.width, this.height)
+
+    frameXPos = spriteWidth + (spriteWidth * animationFrame)
+
+    globalCanvasCtx.drawImage(playerSpriteSheet, 8 + frameXPos, 0, spriteWidth, spriteHeight, this.position.x, this.position.y, this.width, this.height)
+    animationFrame++;
+    if (animationFrame >= 7) animationFrame = 0;
+
     globalCanvasCtx.shadowBlur = 0;
   }
 

@@ -18,3 +18,7 @@ h1, p, span {
 .hidden {
   display: none
 }
+
+canvas:focus {
+  outline: none;
+}

@@ -35,7 +35,7 @@ export default function Game() {
     const file: File | undefined = (event.target as HTMLInputElement)?.files?.[0];
     const fileUrl: string = blob.createObjectURL(file);
     const audioElement: HTMLMediaElement = document.getElementById("audioSource") as HTMLMediaElement;
-    document.getElementById("audioFile")?.classList.add("hidden");
+    document.getElementById("gameSetup")?.classList.add("hidden");
     audioElement.src = fileUrl;
 
     const fileReader: FileReader = new FileReader();
@@ -124,7 +124,7 @@ export default function Game() {
     let previousTime: number = performance.now();
 
     setLoading(false);
-    document.getElementById("playButton")?.classList.remove("hidden");
+    document.getElementById("gameButtons")?.classList.remove("hidden");
 
     globalRenderX = 0;
     globalCanvasCtx.fillStyle = "black";
@@ -262,7 +262,6 @@ export default function Game() {
 
     function updateRenderX(): void {
       if (globalRenderX < globalLevelData.length) {
-        // visual Offset milliseconds may need to be adjusted if sprite ever moves. 
         const visualOffsetInMs: number = 700;
         const progressPercentage: number = globalAudioHTMLElement.currentTime / globalAudioBuffer.duration;
         const audioTimeVis: number = progressPercentage * globalLevelData[globalLevelData.length - 1].x;
@@ -276,23 +275,33 @@ export default function Game() {
   return (
     <>
       <h1>Rhythm Runner</h1>
+      <hr />
+      
+      <div id="gameSetup">
+        <p>Upload an audio file to begin:</p>
+        <input
+          type="file"
+          accept="audio/*"
+          id="audioFile"
+          onChange={handleAudioUpload}
+        />
+        <audio id="audioSource" />
+      </div>
 
-      <input
-        type="file"
-        accept="audio/*"
-        id="audioFile"
-        onChange={handleAudioUpload}
-      />
-      <audio id="audioSource" />
       {loading && (
         <p>Loading...</p>
       )}
-      
-      <button id="playButton" data-playing="false" role="switch" aria-checked="false" className="hidden">
-        <span>Play/Pause</span>
-      </button>
 
-      <br /><br />
+      <div id="gameButtons" className="hidden">
+        <button id="playButton" data-playing="false" role="switch" aria-checked="false">
+          <span>Play / Pause</span>
+        </button>
+        <button id="changeTrackButton" aria-checked="false" onClick={() => location.reload()}>
+          <span>Change Track</span>
+        </button>
+        <br /><br />
+      </div>
+
       <canvas id="playArea" width="800" height="600"></canvas>
     </>
   )

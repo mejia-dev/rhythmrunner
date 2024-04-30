@@ -165,6 +165,7 @@ export default function Game() {
     function updateGlobalAudioColor(): void {
       const colorIndex: number = Math.floor((globalRenderX / globalLevelData.length) * 255);
       globalAudioColor = `rgb(${colorIndex}, ${(255 - colorIndex)}, ${(128 + colorIndex)})`;
+      document.getElementById("logoText")?.style.setProperty("color", globalAudioColor)
     }
 
     function drawPlatform(): void {

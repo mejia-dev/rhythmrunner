@@ -14,20 +14,19 @@ export let globalPreviousRenderX: number;
 export let globalRenderX: number;
 export const globalScoreSet: Set<string> = new Set();
 
-let globalAudioBuffer: AudioBuffer;
-let globalAudioContext: AudioContext;
-let globalAudioHTMLElement: HTMLMediaElement;
-let globalAudioIsPlaying: boolean = false;
-let globalEnemySpawnedList: EnemyObj[] = [];
-let globalEnemySpawnInterval: number;
-let globalEnemyTimer = 0;
-let globalEnemyTimerPausedState = 0;
-
 
 export default function Game() {
 
-  console.log(typeof(window.URL));
-  console.log(typeof(window.webkitURL));
+  let globalAudioBuffer: AudioBuffer;
+  let globalAudioColor: string;
+  let globalAudioContext: AudioContext;
+  let globalAudioHTMLElement: HTMLMediaElement;
+  let globalAudioIsPlaying: boolean = false;
+  let globalEnemySpawnedList: EnemyObj[] = [];
+  let globalEnemySpawnInterval: number;
+  let globalEnemyTimer = 0;
+  let globalEnemyTimerPausedState = 0;
+
 
   function handleAudioUpload(event: Event | ChangeEvent): void {
     const blob: any = window.URL || window.webkitURL;
@@ -44,7 +43,6 @@ export default function Game() {
     if (file) fileReader.readAsArrayBuffer(file);
   }
 
-
   function initializeAudioTrack(bufferedAudioArray: ArrayBuffer): void {
     globalAudioContext = new window.AudioContext();
     globalAudioHTMLElement = document.getElementById("audioSource") as HTMLMediaElement;
@@ -52,7 +50,6 @@ export default function Game() {
     track.connect(globalAudioContext.destination);
     globalAudioContext.decodeAudioData(bufferedAudioArray, (buffer) => {
       globalAudioBuffer = buffer;
-
       initializeAudioControls();
       initializeCanvas();
     });
@@ -139,10 +136,11 @@ export default function Game() {
         deltaTime = timestamp - previousTime;
         deltaTimeMultiplier = deltaTime / frame_interval;
         resetCanvas()
+        updateGlobalAudioColor();
+        drawPlatform();
         drawLevel(deltaTimeMultiplier);
         player1.requestUpdate(deltaTimeMultiplier);
         updateSpawnedEnemies(deltaTimeMultiplier);
-        drawPlatform();
         handleWin();
         handleLose();
         drawHUD();
@@ -158,12 +156,14 @@ export default function Game() {
       globalCanvasCtx.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
     }
 
+    function updateGlobalAudioColor(): void {
+      const colorIndex: number = Math.floor((globalRenderX / globalLevelData.length) * 255);
+      globalAudioColor = `rgb(${colorIndex}, ${(255 - colorIndex)}, ${(128 + colorIndex)})`;
+    }
+
     function drawLevel(deltaTimeMultiplier: number): void {
       globalCanvasCtx.beginPath();
-      const colorIndex: number = Math.floor((globalRenderX / globalLevelData.length) * 255);
-      const color: string = `rgb(${colorIndex}, ${(255 - colorIndex)}, ${(128 + colorIndex)})`;
-      globalCanvasCtx.strokeStyle = color;
-
+      globalCanvasCtx.strokeStyle = globalAudioColor;
       globalCanvasCtx.moveTo(globalLevelData[0].x - globalRenderX, globalLevelData[0].y);
       for (let i = 1; i < globalLevelData.length; i++) {
         globalCanvasCtx.lineTo((globalLevelData[i].x - globalRenderX) * deltaTimeMultiplier, globalLevelData[i].y);
@@ -258,14 +258,12 @@ export default function Game() {
       globalCanvasCtx.fillStyle = "white";
       globalCanvasCtx.font = "20px Arial";
       globalCanvasCtx.fillText(`Lives: ${player1.lives}`, 50, 30);
-      globalCanvasCtx.fillText(`Score: ${ player1.score }`, 50, 60);
-
-      
+      globalCanvasCtx.fillText(`Score: ${player1.score}`, 50, 60);
     }
 
     function drawPlatform(): void {
-      globalCanvasCtx.fillStyle = "white";
-      globalCanvasCtx.fillRect(0, globalPlatformY, globalCanvas.width, 5);
+      globalCanvasCtx.fillStyle = globalAudioColor;
+      globalCanvasCtx.fillRect(0, globalPlatformY, globalCanvas.width, 3);
     }
 
   }

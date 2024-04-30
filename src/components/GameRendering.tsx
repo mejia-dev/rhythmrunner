@@ -1,7 +1,7 @@
 import PlayerObj from "./PlayerObj";
 import InputController from "./InputController";
 import EnemyObj from "./EnemyObj";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 
 
 export let globalCanvas: HTMLCanvasElement;
@@ -27,12 +27,15 @@ export default function Game() {
   let globalEnemyTimer = 0;
   let globalEnemyTimerPausedState = 0;
 
+  const [loading, setLoading] = useState<Boolean>(false);
 
   function handleAudioUpload(event: Event | ChangeEvent): void {
+    setLoading(true);
     const blob: any = window.URL || window.webkitURL;
     const file: File | undefined = (event.target as HTMLInputElement)?.files?.[0];
     const fileUrl: string = blob.createObjectURL(file);
     const audioElement: HTMLMediaElement = document.getElementById("audioSource") as HTMLMediaElement;
+    document.getElementById("audioFile")?.classList.add("hidden");
     audioElement.src = fileUrl;
 
     const fileReader: FileReader = new FileReader();
@@ -109,14 +112,6 @@ export default function Game() {
       globalEnemyTimer++;
     }, 1000);
 
-    globalRenderX = 0;
-    globalCanvasCtx.fillStyle = "black";
-    globalCanvasCtx.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
-    globalCanvasCtx.fillStyle = "white";
-    globalCanvasCtx.font = "40px Arial";
-    globalCanvasCtx.textAlign = "center";
-    globalCanvasCtx.fillText("Press Play to Start", globalCanvas.width / 2, globalCanvas.height / 2);
-
     const p1InputController: InputController = new InputController();
     const player1: PlayerObj = new PlayerObj(p1InputController);
 
@@ -127,6 +122,17 @@ export default function Game() {
     let deltaTime: number = 0;
     let deltaTimeMultiplier: number = 1;
     let previousTime: number = performance.now();
+
+    setLoading(false);
+    document.getElementById("playButton")?.classList.remove("hidden");
+
+    globalRenderX = 0;
+    globalCanvasCtx.fillStyle = "black";
+    globalCanvasCtx.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
+    globalCanvasCtx.fillStyle = "white";
+    globalCanvasCtx.font = "40px Arial";
+    globalCanvasCtx.textAlign = "center";
+    globalCanvasCtx.fillText("Press Play to Start", globalCanvas.width / 2, globalCanvas.height / 2);
 
     requestAnimationFrame(gameLoop);
 
@@ -271,12 +277,21 @@ export default function Game() {
     <>
       <h1>Rhythm Runner</h1>
 
-      <input type="file" accept="audio/*" id="audioFile" onChange={handleAudioUpload}></input>
-      <audio id="audioSource"></audio>
-
-      <button id="playButton" data-playing="false" role="switch" aria-checked="false">
+      <input
+        type="file"
+        accept="audio/*"
+        id="audioFile"
+        onChange={handleAudioUpload}
+      />
+      <audio id="audioSource" />
+      {loading && (
+        <p>Loading...</p>
+      )}
+      
+      <button id="playButton" data-playing="false" role="switch" aria-checked="false" className="hidden">
         <span>Play/Pause</span>
       </button>
+
       <br /><br />
       <canvas id="playArea" width="800" height="600"></canvas>
     </>

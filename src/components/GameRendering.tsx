@@ -144,7 +144,6 @@ export default function Game() {
 
     function gameLoop(timestamp: number): void {
       checkEnemySpawn();
-      console.log(globalEnemyTimer)
       if (globalAudioIsPlaying) {
         deltaTime = timestamp - previousTime;
         deltaTimeMultiplier = deltaTime / frame_interval;
@@ -279,6 +278,7 @@ export default function Game() {
       globalPlayButtonText.innerText = "Retry Track";
       player1.position.x = globalCanvas.width / 2 - 200;
       player1.reset();
+      globalEnemyTimerPausedState = 0;
       globalRenderX = 0;
       globalAudioHTMLElement.currentTime = 0;
     }

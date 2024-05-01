@@ -23,7 +23,6 @@ export default function Game() {
   let globalAudioHTMLElement: HTMLMediaElement;
   let globalAudioIsPlaying: boolean = false;
   let globalEnemySpawnedList: EnemyObj[] = [];
-  let globalEnemySpawnInterval: number;
   let globalEnemyTimer = 0;
   let globalEnemyTimerPausedState = 0;
   let globalPlayButton: HTMLButtonElement;
@@ -115,7 +114,7 @@ export default function Game() {
   }
 
   function startCanvas(): void {
-    globalEnemySpawnInterval = setInterval(() => {
+    setInterval(() => {
       globalEnemyTimer++;
     }, 1000);
 
@@ -145,6 +144,7 @@ export default function Game() {
 
     function gameLoop(timestamp: number): void {
       checkEnemySpawn();
+      console.log(globalEnemyTimer)
       if (globalAudioIsPlaying) {
         deltaTime = timestamp - previousTime;
         deltaTimeMultiplier = deltaTime / frame_interval;
@@ -259,7 +259,6 @@ export default function Game() {
     function handleLose(): void {
       if (player1.lives <= 0) {
         freezeGame();
-        if (globalEnemySpawnInterval) globalEnemySpawnInterval = 0;
         globalCanvasCtx.fillStyle = "white";
         globalCanvasCtx.font = "40px Audiowide";
         globalCanvasCtx.textAlign = "center";

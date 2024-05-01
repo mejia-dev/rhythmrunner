@@ -242,6 +242,7 @@ export default function Game() {
         globalCanvasCtx.font = "20px Audiowide";
         globalCanvasCtx.textAlign = "center";
         globalCanvasCtx.fillText(`Your score: ${player1.score} `, globalCanvas.width / 2, (globalCanvas.height / 2));
+        if (player1.position.x < globalCanvas.width) player1.position.x += 9;
       }
     }
 

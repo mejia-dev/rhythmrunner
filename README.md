@@ -1,3 +1,5 @@
+Spritesheet from: https://0x72.itch.io/16x16-robot-tileset
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

@@ -1,5 +1,13 @@
 import InputController from "./InputController";
 import { globalCanvasCtx, globalGravity, globalPlatformY, globalScoreSet } from "./GameRendering";
+import spritesheet from "../assets/img/robo_sprite_sheet.png";
+
+const playerSpriteSheet: HTMLImageElement = new Image();
+playerSpriteSheet.src = spritesheet;
+const spriteHeight: number = 72;
+const spriteWidth: number = 64;
+let animationFrame: number = 0;
+let frameXPos: number = 0;
 
 export default class PlayerObj {
   inputController: InputController
@@ -16,7 +24,7 @@ export default class PlayerObj {
 
   constructor(playerInputController: InputController) {
     this.inputController = playerInputController;
-    this.width = 50;
+    this.width = 47;
     this.height = 50;
     this.jumpHeight = 15;
     this.canDoubleJump = false;
@@ -33,13 +41,19 @@ export default class PlayerObj {
     }
   }
 
-  draw(): void {
+  draw(deltaTimeMultiplier: number): void {
     if (this.isInvincible) {
       globalCanvasCtx.shadowBlur = 15;
       globalCanvasCtx.shadowColor = "red";
     }
-    globalCanvasCtx.fillStyle = "blue";
-    globalCanvasCtx.fillRect(this.position.x, this.position.y, this.width, this.height);
+
+    frameXPos = spriteWidth + (spriteWidth * Math.floor(animationFrame))
+
+    globalCanvasCtx.drawImage(playerSpriteSheet, 8 + frameXPos, 0, spriteWidth, spriteHeight, this.position.x, this.position.y, this.width, this.height)
+    
+    animationFrame += 0.60 * deltaTimeMultiplier;
+    if (animationFrame >= 7) animationFrame = -1;
+
     globalCanvasCtx.shadowBlur = 0;
   }
 
@@ -88,9 +102,15 @@ export default class PlayerObj {
     }
   }
 
+  reset(): void {
+    this.lives = 3;
+    this.score = 0;
+    globalScoreSet.clear();
+  }
+
   requestUpdate(deltaTimeMultiplier: number): void {
     this.checkJump();
     this.enforceGravity(deltaTimeMultiplier);
-    this.draw();
+    this.draw(deltaTimeMultiplier);
   }
 }

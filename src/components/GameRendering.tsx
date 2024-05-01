@@ -1,8 +1,8 @@
 import PlayerObj from "./PlayerObj";
 import InputController from "./InputController";
 import EnemyObj from "./EnemyObj";
-import { ChangeEvent } from "react";
-
+import { ChangeEvent, useState } from "react";
+import deathSound from "../assets/audio/492651__rvgerxini__power-down.mp3";
 
 export let globalCanvas: HTMLCanvasElement;
 export let globalCanvasCtx: CanvasRenderingContext2D;
@@ -14,26 +14,30 @@ export let globalPreviousRenderX: number;
 export let globalRenderX: number;
 export const globalScoreSet: Set<string> = new Set();
 
-let globalAudioBuffer: AudioBuffer;
-let globalAudioContext: AudioContext;
-let globalAudioHTMLElement: HTMLMediaElement;
-let globalAudioIsPlaying: boolean = false;
-let globalEnemySpawnedList: EnemyObj[] = [];
-let globalEnemySpawnInterval: number;
-let globalEnemyTimer = 0;
-let globalEnemyTimerPausedState = 0;
-
 
 export default function Game() {
 
-  console.log(typeof(window.URL));
-  console.log(typeof(window.webkitURL));
+  let globalAudioBuffer: AudioBuffer;
+  let globalAudioColor: string;
+  let globalAudioContext: AudioContext;
+  let globalAudioHTMLElement: HTMLMediaElement;
+  let globalAudioIsPlaying: boolean = false;
+  let globalEnemySpawnedList: EnemyObj[] = [];
+  let globalEnemySpawnInterval: number;
+  let globalEnemyTimer = 0;
+  let globalEnemyTimerPausedState = 0;
+  let globalPlayButton: HTMLButtonElement;
+  let globalPlayButtonText: HTMLSpanElement;
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   function handleAudioUpload(event: Event | ChangeEvent): void {
+    setLoading(true);
     const blob: any = window.URL || window.webkitURL;
     const file: File | undefined = (event.target as HTMLInputElement)?.files?.[0];
     const fileUrl: string = blob.createObjectURL(file);
     const audioElement: HTMLMediaElement = document.getElementById("audioSource") as HTMLMediaElement;
+    document.getElementById("gameSetup")?.classList.add("hidden");
     audioElement.src = fileUrl;
 
     const fileReader: FileReader = new FileReader();
@@ -44,7 +48,6 @@ export default function Game() {
     if (file) fileReader.readAsArrayBuffer(file);
   }
 
-
   function initializeAudioTrack(bufferedAudioArray: ArrayBuffer): void {
     globalAudioContext = new window.AudioContext();
     globalAudioHTMLElement = document.getElementById("audioSource") as HTMLMediaElement;
@@ -52,27 +55,31 @@ export default function Game() {
     track.connect(globalAudioContext.destination);
     globalAudioContext.decodeAudioData(bufferedAudioArray, (buffer) => {
       globalAudioBuffer = buffer;
-
       initializeAudioControls();
       initializeCanvas();
     });
   }
 
   function initializeAudioControls(): void {
-    const playButton: HTMLButtonElement = document.getElementById("playButton") as HTMLButtonElement;
-    playButton.addEventListener("click", () => {
+    globalPlayButton = document.getElementById("playButton") as HTMLButtonElement;
+    globalPlayButtonText = document.getElementById("playButtonText") as HTMLSpanElement;
+    globalPlayButton.addEventListener("click", () => {
       if (globalAudioContext.state === "suspended") {
         globalAudioContext.resume();
         globalAudioIsPlaying = true;
+        globalCanvas.focus();
       }
-      if (playButton.dataset.playing === "false") {
+      if (globalPlayButton.dataset.playing === "false") {
+        globalPlayButtonText.innerText = "Play / Pause";
         globalAudioHTMLElement.play();
         globalAudioIsPlaying = true;
-        playButton.dataset.playing = "true";
-      } else if (playButton.dataset.playing === "true") {
+        globalPlayButton.dataset.playing = "true";
+        globalCanvas.focus();
+      } else if (globalPlayButton.dataset.playing === "true") {
         globalAudioHTMLElement.pause();
         globalAudioIsPlaying = false;
-        playButton.dataset.playing = "false";
+        globalPlayButton.dataset.playing = "false";
+        globalCanvas.focus();
       }
     },
       false,
@@ -112,24 +119,27 @@ export default function Game() {
       globalEnemyTimer++;
     }, 1000);
 
-    globalRenderX = 0;
-    globalCanvasCtx.fillStyle = "black";
-    globalCanvasCtx.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
-    globalCanvasCtx.fillStyle = "white";
-    globalCanvasCtx.font = "40px Arial";
-    globalCanvasCtx.textAlign = "center";
-    globalCanvasCtx.fillText("Press Play to Start", globalCanvas.width / 2, globalCanvas.height / 2);
-
     const p1InputController: InputController = new InputController();
     const player1: PlayerObj = new PlayerObj(p1InputController);
 
-    player1.position.x = globalCanvas.width / 2 - 50;
+    player1.position.x = globalCanvas.width / 2 - 200;
 
     const targetFPS: number = 60;
     const frame_interval: number = 1000 / targetFPS;
     let deltaTime: number = 0;
     let deltaTimeMultiplier: number = 1;
     let previousTime: number = performance.now();
+
+    setLoading(false);
+    document.getElementById("gameButtons")?.classList.remove("hidden");
+
+    globalRenderX = 0;
+    globalCanvasCtx.fillStyle = "black";
+    globalCanvasCtx.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
+    globalCanvasCtx.fillStyle = "white";
+    globalCanvasCtx.font = "40px Audiowide";
+    globalCanvasCtx.textAlign = "center";
+    globalCanvasCtx.fillText("Press Play to Start", globalCanvas.width / 2, globalCanvas.height / 2);
 
     requestAnimationFrame(gameLoop);
 
@@ -138,13 +148,12 @@ export default function Game() {
       if (globalAudioIsPlaying) {
         deltaTime = timestamp - previousTime;
         deltaTimeMultiplier = deltaTime / frame_interval;
-
-
-        globalCanvasCtx.clearRect(0, 0, globalCanvas.width, globalCanvas.height);
+        resetCanvas();
+        updateGlobalAudioColor();
+        drawPlatform();
         drawLevel(deltaTimeMultiplier);
         player1.requestUpdate(deltaTimeMultiplier);
         updateSpawnedEnemies(deltaTimeMultiplier);
-        drawPlatform();
         handleWin();
         handleLose();
         drawHUD();
@@ -154,67 +163,31 @@ export default function Game() {
       requestAnimationFrame(gameLoop);
     }
 
-    function drawLevel(deltaTimeMultiplier: number): void {
+    function resetCanvas(): void {
       globalCanvasCtx.clearRect(0, 0, globalCanvas.width, globalCanvas.height);
-      globalCanvasCtx.beginPath();
+      globalCanvasCtx.fillStyle = "black";
+      globalCanvasCtx.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
+    }
 
+    function updateGlobalAudioColor(): void {
       const colorIndex: number = Math.floor((globalRenderX / globalLevelData.length) * 255);
-      const color: string = `rgb(${colorIndex}, ${(255 - colorIndex)}, ${(128 + colorIndex)})`;
-      globalCanvasCtx.strokeStyle = color;
+      globalAudioColor = `rgb(${colorIndex}, ${(255 - colorIndex)}, ${(128 + colorIndex)})`;
+      document.getElementById("logoText")?.style.setProperty("color", globalAudioColor)
+    }
 
+    function drawPlatform(): void {
+      globalCanvasCtx.fillStyle = globalAudioColor;
+      globalCanvasCtx.fillRect(0, globalPlatformY, globalCanvas.width, 3);
+    }
+
+    function drawLevel(deltaTimeMultiplier: number): void {
+      globalCanvasCtx.beginPath();
+      globalCanvasCtx.strokeStyle = globalAudioColor;
       globalCanvasCtx.moveTo(globalLevelData[0].x - globalRenderX, globalLevelData[0].y);
       for (let i = 1; i < globalLevelData.length; i++) {
         globalCanvasCtx.lineTo((globalLevelData[i].x - globalRenderX) * deltaTimeMultiplier, globalLevelData[i].y);
       }
       globalCanvasCtx.stroke();
-    }
-
-    function updateRenderX(): void {
-      if (globalRenderX < globalLevelData.length) {
-        // visual Offset milliseconds may need to be adjusted if sprite ever moves. 
-        const visualOffsetInMs: number = 700;
-        const progressPercentage: number = globalAudioHTMLElement.currentTime / globalAudioBuffer.duration;
-        const audioTimeVis: number = progressPercentage * globalLevelData[globalLevelData.length - 1].x;
-        const offsetAudioTime: number = audioTimeVis - visualOffsetInMs;
-        globalPreviousRenderX = globalRenderX;
-        globalRenderX = Math.max(offsetAudioTime, 0);
-      }
-    }
-
-    function checkCollision(
-      object1: { position: { x: number, y: number }, width: number, height: number }, object2: { position: { x: number, y: number }, width: number, height: number }
-    ): boolean {
-      return (
-        object1.position.x + object1.width >= object2.position.x &&
-        object1.position.y + object1.height >= object2.position.y &&
-        object2.position.x + object2.height >= object1.position.x &&
-        object2.position.y + object2.height >= object1.position.y
-      );
-    }
-
-    function handleWin(): void {
-      if (globalAudioHTMLElement.currentTime >= globalAudioBuffer.duration) {
-        globalCanvasCtx.fillStyle = "white";
-        globalCanvasCtx.font = "40px Arial";
-        globalCanvasCtx.textAlign = "center";
-        globalCanvasCtx.fillText("You Win!", globalCanvas.width / 2, (globalCanvas.height / 2) - 40);
-        globalCanvasCtx.fillStyle = "white";
-        globalCanvasCtx.font = "20px Arial";
-        globalCanvasCtx.textAlign = "center";
-        globalCanvasCtx.fillText(`Your score: ${player1.score} `, globalCanvas.width / 2, (globalCanvas.height / 2));
-      }
-    }
-
-    function handleLose(): void {
-      if (player1.lives <= 0) {
-        globalAudioHTMLElement.pause();
-        globalAudioIsPlaying = false;
-        if (globalEnemySpawnInterval) globalEnemySpawnInterval = 0;
-        globalCanvasCtx.fillStyle = "white";
-        globalCanvasCtx.font = "40px Arial";
-        globalCanvasCtx.textAlign = "center";
-        globalCanvasCtx.fillText("You Lose", globalCanvas.width / 2, globalCanvas.height / 2);
-      }
     }
 
     function checkEnemySpawn(): void {
@@ -252,34 +225,120 @@ export default function Game() {
       });
     }
 
+    function checkCollision(
+      object1: { position: { x: number, y: number }, width: number, height: number }, object2: { position: { x: number, y: number }, width: number, height: number }
+    ): boolean {
+      return (
+        object1.position.x + object1.width >= object2.position.x &&
+        object1.position.y + object1.height >= object2.position.y &&
+        object2.position.x + object2.height >= object1.position.x &&
+        object2.position.y + object2.height >= object1.position.y
+      );
+    }
+
+    function handleWin(): void {
+      if (globalAudioHTMLElement.currentTime >= globalAudioBuffer.duration) {
+        globalCanvasCtx.fillStyle = "white";
+        globalCanvasCtx.font = "40px Audiowide";
+        globalCanvasCtx.textAlign = "center";
+        globalCanvasCtx.fillText("You Win", globalCanvas.width / 2, (globalCanvas.height / 2) - 40);
+        globalCanvasCtx.fillStyle = "white";
+        globalCanvasCtx.font = "20px Audiowide";
+        globalCanvasCtx.textAlign = "center";
+        globalCanvasCtx.fillText(`Your score: ${player1.score} `, globalCanvas.width / 2, (globalCanvas.height / 2));
+        globalRenderX += 250;
+        if (player1.position.x < globalCanvas.width) {
+          player1.position.x += 9;
+        } else {
+          freezeGame();
+          setTimeout(resetGame, 500);
+        }
+      }
+    }
+
+    function handleLose(): void {
+      if (player1.lives <= 0) {
+        freezeGame();
+        if (globalEnemySpawnInterval) globalEnemySpawnInterval = 0;
+        globalCanvasCtx.fillStyle = "white";
+        globalCanvasCtx.font = "40px Audiowide";
+        globalCanvasCtx.textAlign = "center";
+        globalCanvasCtx.fillText("You Lose", globalCanvas.width / 2, globalCanvas.height / 2);
+        const loseSound: HTMLAudioElement = new Audio(deathSound);
+        loseSound.play();
+        setTimeout(resetGame, 500);
+      }
+    }
+
+    function freezeGame(): void {
+      globalAudioHTMLElement.pause();
+      globalAudioIsPlaying = false;
+      globalPlayButton.dataset.playing = "false";
+    }
+
+    function resetGame(): void {
+      globalPlayButtonText.innerText = "Retry Track";
+      player1.position.x = globalCanvas.width / 2 - 200;
+      player1.reset();
+      globalRenderX = 0;
+      globalAudioHTMLElement.currentTime = 0;
+    }
+
     function drawHUD(): void {
       globalCanvasCtx.fillStyle = "white";
-      globalCanvasCtx.font = "20px Arial";
-      globalCanvasCtx.fillText(`Lives: ${player1.lives}`, 50, 30);
-      globalCanvasCtx.fillText(`Score: ${ player1.score }`, 50, 60);
-
-      
+      globalCanvasCtx.font = "20px Audiowide";
+      globalCanvasCtx.fillText(`Score: ${player1.score}`, 70, 70);
+      if (player1.lives < 2) {
+        globalCanvasCtx.fillStyle = "red";
+      }
+      globalCanvasCtx.fillText(`Lives: ${player1.lives}`, 70, 40);
     }
 
-    function drawPlatform(): void {
-      globalCanvasCtx.fillStyle = "green";
-      globalCanvasCtx.fillRect(0, globalPlatformY, globalCanvas.width, 10);
+    function updateRenderX(): void {
+      if (globalRenderX < globalLevelData.length) {
+        const visualOffsetInMs: number = 250;
+        const progressPercentage: number = globalAudioHTMLElement.currentTime / globalAudioBuffer.duration;
+        const audioTimeVis: number = progressPercentage * globalLevelData[globalLevelData.length - 1].x;
+        const offsetAudioTime: number = audioTimeVis - visualOffsetInMs;
+        globalPreviousRenderX = globalRenderX;
+        globalRenderX = Math.max(offsetAudioTime, 0);
+      }
     }
-
   }
 
   return (
     <>
-      <h1>Rhythm Runner</h1>
+      <h1 id="logoText">Rhythm Runner</h1>
+      <hr />
+      <br />
+      <div id="gameSetup">
+        <p>Upload an audio file to play:</p>
+        <input
+          type="file"
+          accept="audio/*"
+          id="audioFile"
+          onChange={handleAudioUpload}
+        />
+        <audio id="audioSource" />
+      </div>
 
-      <input type="file" accept="audio/*" id="audioFile" onChange={handleAudioUpload}></input>
-      <audio id="audioSource"></audio>
+      {loading && (
+        <p>Loading...</p>
+      )}
 
-      <button id="playButton" data-playing="false" role="switch" aria-checked="false">
-        <span>Play/Pause</span>
-      </button>
-      <br /><br />
-      <canvas id="playArea" width="800" height="600"></canvas>
+      <div id="gameButtons" className="hidden">
+        <button id="playButton" data-playing="false" role="switch" aria-checked="false">
+          <span id="playButtonText">Play / Pause</span>
+        </button>
+
+        <button id="changeTrackButton" aria-checked="false" onClick={() => location.reload()}>
+          <span>Change Track</span>
+        </button>
+        <br /><br />
+      </div>
+
+
+      <canvas id="playArea" width="800" height="600" tabIndex={0} />
     </>
   )
 }

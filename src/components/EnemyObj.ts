@@ -27,15 +27,15 @@ export default class EnemyObj {
     globalCanvasCtx.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 
-  updateMoveSpeed(): void {
+  moveToLeft(deltaTimeMultiplier: number): void {
     const prevLevelX = (globalPreviousRenderX / globalLevelData.length) * globalLevelData[globalLevelData.length - 1].x;
     const currentLevelX = (globalRenderX / globalLevelData.length) * globalLevelData[globalLevelData.length - 1].x;
     this.moveSpeed = (currentLevelX - prevLevelX);
+    this.position.x -= this.moveSpeed * deltaTimeMultiplier;
   }
 
   requestUpdate(deltaTimeMultiplier: number): void {
-    this.updateMoveSpeed();
-    this.position.x -= this.moveSpeed * deltaTimeMultiplier;
+    this.moveToLeft(deltaTimeMultiplier);
     if (this.isAlive) {
       this.draw();
     }

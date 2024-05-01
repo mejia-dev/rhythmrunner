@@ -26,6 +26,8 @@ export default function Game() {
   let globalEnemySpawnInterval: number;
   let globalEnemyTimer = 0;
   let globalEnemyTimerPausedState = 0;
+  let globalPlayButton: HTMLButtonElement;
+  let globalPlayButtonText: HTMLSpanElement;
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -59,22 +61,24 @@ export default function Game() {
   }
 
   function initializeAudioControls(): void {
-    const playButton: HTMLButtonElement = document.getElementById("playButton") as HTMLButtonElement;
-    playButton.addEventListener("click", () => {
+    globalPlayButton = document.getElementById("playButton") as HTMLButtonElement;
+    globalPlayButtonText = document.getElementById("playButtonText") as HTMLSpanElement;
+    globalPlayButton.addEventListener("click", () => {
       if (globalAudioContext.state === "suspended") {
         globalAudioContext.resume();
         globalAudioIsPlaying = true;
         globalCanvas.focus();
       }
-      if (playButton.dataset.playing === "false") {
+      if (globalPlayButton.dataset.playing === "false") {
+        globalPlayButtonText.innerText = "Play / Pause";
         globalAudioHTMLElement.play();
         globalAudioIsPlaying = true;
-        playButton.dataset.playing = "true";
+        globalPlayButton.dataset.playing = "true";
         globalCanvas.focus();
-      } else if (playButton.dataset.playing === "true") {
+      } else if (globalPlayButton.dataset.playing === "true") {
         globalAudioHTMLElement.pause();
         globalAudioIsPlaying = false;
-        playButton.dataset.playing = "false";
+        globalPlayButton.dataset.playing = "false";
         globalCanvas.focus();
       }
     },
@@ -141,11 +145,11 @@ export default function Game() {
 
     function gameLoop(timestamp: number): void {
       checkEnemySpawn();
-      updateGlobalAudioColor();
       if (globalAudioIsPlaying) {
         deltaTime = timestamp - previousTime;
         deltaTimeMultiplier = deltaTime / frame_interval;
-        resetCanvas()
+        resetCanvas();
+        updateGlobalAudioColor();
         drawPlatform();
         drawLevel(deltaTimeMultiplier);
         player1.requestUpdate(deltaTimeMultiplier);
@@ -246,16 +250,13 @@ export default function Game() {
         if (player1.position.x < globalCanvas.width) {
           player1.position.x += 9;
         } else {
-          globalAudioHTMLElement.pause();
-          globalAudioIsPlaying = false;
+          resetGame();
         }
       }
     }
 
     function handleLose(): void {
       if (player1.lives <= 0) {
-        globalAudioHTMLElement.pause();
-        globalAudioIsPlaying = false;
         if (globalEnemySpawnInterval) globalEnemySpawnInterval = 0;
         globalCanvasCtx.fillStyle = "white";
         globalCanvasCtx.font = "40px Audiowide";
@@ -263,7 +264,22 @@ export default function Game() {
         globalCanvasCtx.fillText("You Lose", globalCanvas.width / 2, globalCanvas.height / 2);
         const loseSound: HTMLAudioElement = new Audio(deathSound);
         loseSound.play();
+        resetGame();
       }
+    }
+
+    function resetGame(): void {
+      globalAudioHTMLElement.pause();
+      globalAudioIsPlaying = false;
+
+      globalPlayButton.dataset.playing = "false";
+      globalPlayButtonText.innerText = "Retry Track";
+
+      globalRenderX = 0;
+      globalAudioHTMLElement.currentTime = 0;
+      player1.position.x = globalCanvas.width / 2 - 200;
+      player1.lives = 3;
+      player1.score = 0;
     }
 
     function drawHUD(): void {
@@ -310,7 +326,7 @@ export default function Game() {
 
       <div id="gameButtons" className="hidden">
         <button id="playButton" data-playing="false" role="switch" aria-checked="false">
-          <span>Play / Pause</span>
+          <span id="playButtonText">Play / Pause</span>
         </button>
         <button id="changeTrackButton" aria-checked="false" onClick={() => location.reload()}>
           <span>Change Track</span>

@@ -250,13 +250,15 @@ export default function Game() {
         if (player1.position.x < globalCanvas.width) {
           player1.position.x += 9;
         } else {
-          resetGame();
+          freezeGame();
+          setTimeout(resetGame, 500);
         }
       }
     }
 
     function handleLose(): void {
       if (player1.lives <= 0) {
+        freezeGame();
         if (globalEnemySpawnInterval) globalEnemySpawnInterval = 0;
         globalCanvasCtx.fillStyle = "white";
         globalCanvasCtx.font = "40px Audiowide";
@@ -264,22 +266,22 @@ export default function Game() {
         globalCanvasCtx.fillText("You Lose", globalCanvas.width / 2, globalCanvas.height / 2);
         const loseSound: HTMLAudioElement = new Audio(deathSound);
         loseSound.play();
-        resetGame();
+        setTimeout(resetGame, 500);
       }
     }
 
-    function resetGame(): void {
+    function freezeGame(): void {
       globalAudioHTMLElement.pause();
       globalAudioIsPlaying = false;
-
       globalPlayButton.dataset.playing = "false";
-      globalPlayButtonText.innerText = "Retry Track";
+    }
 
+    function resetGame(): void {
+      globalPlayButtonText.innerText = "Retry Track";
+      player1.position.x = globalCanvas.width / 2 - 200;
+      player1.reset();
       globalRenderX = 0;
       globalAudioHTMLElement.currentTime = 0;
-      player1.position.x = globalCanvas.width / 2 - 200;
-      player1.lives = 3;
-      player1.score = 0;
     }
 
     function drawHUD(): void {
@@ -328,11 +330,13 @@ export default function Game() {
         <button id="playButton" data-playing="false" role="switch" aria-checked="false">
           <span id="playButtonText">Play / Pause</span>
         </button>
+
         <button id="changeTrackButton" aria-checked="false" onClick={() => location.reload()}>
           <span>Change Track</span>
         </button>
         <br /><br />
       </div>
+
 
       <canvas id="playArea" width="800" height="600" tabIndex={0} />
     </>

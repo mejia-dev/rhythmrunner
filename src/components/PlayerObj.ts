@@ -41,17 +41,18 @@ export default class PlayerObj {
     }
   }
 
-  draw(): void {
+  draw(deltaTimeMultiplier: number): void {
     if (this.isInvincible) {
       globalCanvasCtx.shadowBlur = 15;
       globalCanvasCtx.shadowColor = "red";
     }
 
-    frameXPos = spriteWidth + (spriteWidth * animationFrame)
+    frameXPos = spriteWidth + (spriteWidth * Math.floor(animationFrame))
 
     globalCanvasCtx.drawImage(playerSpriteSheet, 8 + frameXPos, 0, spriteWidth, spriteHeight, this.position.x, this.position.y, this.width, this.height)
-    animationFrame++;
-    if (animationFrame >= 7) animationFrame = 0;
+    
+    animationFrame += 0.60 * deltaTimeMultiplier;
+    if (animationFrame >= 7) animationFrame = -1;
 
     globalCanvasCtx.shadowBlur = 0;
   }
@@ -110,6 +111,6 @@ export default class PlayerObj {
   requestUpdate(deltaTimeMultiplier: number): void {
     this.checkJump();
     this.enforceGravity(deltaTimeMultiplier);
-    this.draw();
+    this.draw(deltaTimeMultiplier);
   }
 }

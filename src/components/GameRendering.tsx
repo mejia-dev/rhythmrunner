@@ -4,27 +4,25 @@ import EnemyObj from "./EnemyObj";
 import { ChangeEvent, useState } from "react";
 import deathSound from "../assets/audio/492651__rvgerxini__power-down.mp3";
 
-export let globalCanvas: HTMLCanvasElement;
 export let globalCanvasCtx: CanvasRenderingContext2D;
-export let globalEnemyPositionList: { x: number; y: number }[];
 export const globalGravity: number = 0.8;
-export let globalLevelData: { x: number; y: number }[];
 export let globalPlatformY: number;
-export let globalPreviousRenderX: number;
 export let globalRenderX: number;
 export const globalScoreSet: Set<string> = new Set();
 
 
 export default function Game() {
-
+  let globalAudioIsPlaying: boolean = false;
   let globalAudioBuffer: AudioBuffer;
   let globalAudioColor: string;
   let globalAudioContext: AudioContext;
   let globalAudioHTMLElement: HTMLMediaElement;
-  let globalAudioIsPlaying: boolean = false;
+  let globalCanvas: HTMLCanvasElement;
+  let globalEnemyPositionList: { x: number; y: number }[];
   let globalEnemySpawnedList: EnemyObj[] = [];
   let globalEnemyTimer = 0;
   let globalEnemyTimerPausedState = 0;
+  let globalLevelData: { x: number; y: number }[];
   let globalPlayButton: HTMLButtonElement;
   let globalPlayButtonText: HTMLSpanElement;
 
@@ -195,21 +193,20 @@ export default function Game() {
         return;
       }
       globalEnemyTimerPausedState = globalEnemyTimer;
-
-      if (globalEnemyTimer === 3) {
-        globalEnemyTimer = 0;
+      // if (globalEnemyTimer === 3) {
+      //   globalEnemyTimer = 0;
         globalEnemyPositionList.forEach(kvp => {
           if (kvp.x >= globalRenderX && kvp.x <= globalRenderX + globalCanvas.width) {
-            const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50);
+            const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50, kvp.x);
             globalEnemySpawnedList.push(newEnemy);
           }
         });
-      }
+      // }
     }
 
     function updateSpawnedEnemies(deltaTimeMultiplier: number): void {
       globalEnemySpawnedList = globalEnemySpawnedList.filter(enemy => !enemy.readyForDeletion);
-      globalEnemySpawnedList.forEach(enemy => {
+      globalEnemySpawnedList.forEach(enemy => {  
         enemy.requestUpdate(deltaTimeMultiplier);
         if (checkCollision(player1, enemy)) {
           player1.takeDamage(1);
@@ -299,7 +296,6 @@ export default function Game() {
         const progressPercentage: number = globalAudioHTMLElement.currentTime / globalAudioBuffer.duration;
         const audioTimeVis: number = progressPercentage * globalLevelData[globalLevelData.length - 1].x;
         const offsetAudioTime: number = audioTimeVis - visualOffsetInMs;
-        globalPreviousRenderX = globalRenderX;
         globalRenderX = Math.max(offsetAudioTime, 0);
       }
     }

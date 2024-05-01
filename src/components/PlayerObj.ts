@@ -101,6 +101,12 @@ export default class PlayerObj {
     }
   }
 
+  reset(): void {
+    this.lives = 3;
+    this.score = 0;
+    globalScoreSet.clear();
+  }
+
   requestUpdate(deltaTimeMultiplier: number): void {
     this.checkJump();
     this.enforceGravity(deltaTimeMultiplier);

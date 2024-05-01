@@ -1,7 +1,6 @@
 import { globalCanvasCtx, globalRenderX } from "./GameRendering";
 
 export default class EnemyObj {
-  id: string;
   width: number;
   height: number;
   isAlive: boolean;
@@ -10,7 +9,6 @@ export default class EnemyObj {
   position: { x: number, y: number }
 
   constructor(spawnX: number, spawnY: number, xPosOnTrack: number) {
-    this.id = new Date().toLocaleTimeString();
     this.width = 50;
     this.height = 50;
     this.isAlive = true;

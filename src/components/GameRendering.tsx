@@ -8,7 +8,7 @@ export let globalCanvasCtx: CanvasRenderingContext2D;
 export const globalGravity: number = 0.8;
 export let globalPlatformY: number;
 export let globalRenderX: number;
-export const globalScoreSet: Set<string> = new Set();
+export const globalScoreSet: Set<number> = new Set();
 
 
 export default function Game() {
@@ -138,10 +138,11 @@ export default function Game() {
     globalCanvasCtx.textAlign = "center";
     globalCanvasCtx.fillText("Press Play to Start", globalCanvas.width / 2, globalCanvas.height / 2);
 
+    preLoadEnemies();
     requestAnimationFrame(gameLoop);
 
     function gameLoop(timestamp: number): void {
-      checkEnemySpawn();
+      // checkEnemySpawn();
       if (globalAudioIsPlaying) {
         deltaTime = timestamp - previousTime;
         deltaTimeMultiplier = deltaTime / frame_interval;
@@ -187,6 +188,21 @@ export default function Game() {
       globalCanvasCtx.stroke();
     }
 
+    function preLoadEnemies(): void {
+      const reducedEnemySpawnedList: EnemyObj[] = [];
+      globalEnemyPositionList.forEach(kvp => {
+        const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50, kvp.x);
+        globalEnemySpawnedList.push(newEnemy);
+      });
+      // if (globalEnemySpawnedList.length > 10000) {
+      //   const nthElement: number = Math.floor(globalEnemySpawnedList.length / 10)
+      //   for (let i: number = 0; i < globalEnemySpawnedList.length; i = i + nthElement) {
+      //     reducedEnemySpawnedList.push(globalEnemySpawnedList[i]);
+      //   }
+      //   globalEnemySpawnedList = reducedEnemySpawnedList;
+      // }
+    }
+
     function checkEnemySpawn(): void {
       if (!globalAudioIsPlaying) {
         globalEnemyTimer = globalEnemyTimerPausedState;
@@ -195,26 +211,36 @@ export default function Game() {
       globalEnemyTimerPausedState = globalEnemyTimer;
       // if (globalEnemyTimer === 3) {
       //   globalEnemyTimer = 0;
-        globalEnemyPositionList.forEach(kvp => {
-          if (kvp.x >= globalRenderX && kvp.x <= globalRenderX + globalCanvas.width) {
-            const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50, kvp.x);
-            globalEnemySpawnedList.push(newEnemy);
-          }
-        });
+      globalEnemyPositionList.forEach(kvp => {
+        if (kvp.x >= globalRenderX && kvp.x <= globalRenderX + globalCanvas.width && !globalEnemySpawnedList.some((enemy: EnemyObj) => enemy.xPositionOnTrack != kvp.x)) {
+          const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50, kvp.x);
+
+          globalEnemySpawnedList.push(newEnemy);
+
+        }
+      });
       // }
     }
 
     function updateSpawnedEnemies(deltaTimeMultiplier: number): void {
       globalEnemySpawnedList = globalEnemySpawnedList.filter(enemy => !enemy.readyForDeletion);
-      globalEnemySpawnedList.forEach(enemy => {  
+      // console.log(globalEnemySpawnedList)
+      console.log("this list")
+      console.log(globalEnemySpawnedList);
+      globalEnemySpawnedList.forEach(enemy => {
         enemy.requestUpdate(deltaTimeMultiplier);
         if (checkCollision(player1, enemy)) {
+          console.log("hurt!")
+          // removeDuplicateEnemies();
+          console.log(globalEnemySpawnedList)
+          console.log(enemy)
+
           player1.takeDamage(1);
           enemy.isAlive = false;
           enemy.readyForDeletion = true;
         }
         if (enemy.position.x < 0 - enemy.width) {
-          globalScoreSet.add(enemy.id)
+          globalScoreSet.add(enemy.xPositionOnTrack)
           player1.updateScore();
           enemy.readyForDeletion = true;
         }

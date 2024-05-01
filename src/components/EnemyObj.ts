@@ -4,7 +4,6 @@ export default class EnemyObj {
   id: string;
   width: number;
   height: number;
-  moveSpeed: number
   isAlive: boolean;
   readyForDeletion: boolean;
   xPositionOnTrack: number
@@ -14,7 +13,6 @@ export default class EnemyObj {
     this.id = new Date().toLocaleTimeString();
     this.width = 50;
     this.height = 50;
-    this.moveSpeed = 0;
     this.isAlive = true;
     this.readyForDeletion = false;
     this.xPositionOnTrack = xPosOnTrack

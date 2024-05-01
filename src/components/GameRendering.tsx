@@ -141,11 +141,11 @@ export default function Game() {
 
     function gameLoop(timestamp: number): void {
       checkEnemySpawn();
+      updateGlobalAudioColor();
       if (globalAudioIsPlaying) {
         deltaTime = timestamp - previousTime;
         deltaTimeMultiplier = deltaTime / frame_interval;
         resetCanvas()
-        updateGlobalAudioColor();
         drawPlatform();
         drawLevel(deltaTimeMultiplier);
         player1.requestUpdate(deltaTimeMultiplier);
@@ -242,7 +242,13 @@ export default function Game() {
         globalCanvasCtx.font = "20px Audiowide";
         globalCanvasCtx.textAlign = "center";
         globalCanvasCtx.fillText(`Your score: ${player1.score} `, globalCanvas.width / 2, (globalCanvas.height / 2));
-        if (player1.position.x < globalCanvas.width) player1.position.x += 9;
+        globalRenderX += 250;
+        if (player1.position.x < globalCanvas.width) {
+          player1.position.x += 9;
+        } else {
+          globalAudioHTMLElement.pause();
+          globalAudioIsPlaying = false;
+        }
       }
     }
 
@@ -272,7 +278,7 @@ export default function Game() {
 
     function updateRenderX(): void {
       if (globalRenderX < globalLevelData.length) {
-        const visualOffsetInMs: number = 700;
+        const visualOffsetInMs: number = 250;
         const progressPercentage: number = globalAudioHTMLElement.currentTime / globalAudioBuffer.duration;
         const audioTimeVis: number = progressPercentage * globalLevelData[globalLevelData.length - 1].x;
         const offsetAudioTime: number = audioTimeVis - visualOffsetInMs;
@@ -288,7 +294,7 @@ export default function Game() {
       <hr />
       <br />
       <div id="gameSetup">
-        <p>Upload an audio file to begin:</p>
+        <p>Upload an audio file to play:</p>
         <input
           type="file"
           accept="audio/*"

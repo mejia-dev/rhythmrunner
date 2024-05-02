@@ -4,28 +4,23 @@ import EnemyObj from "./EnemyObj";
 import { ChangeEvent, useState } from "react";
 import deathSound from "../assets/audio/492651__rvgerxini__power-down.mp3";
 
-export let globalCanvas: HTMLCanvasElement;
 export let globalCanvasCtx: CanvasRenderingContext2D;
-export let globalEnemyPositionList: { x: number; y: number }[];
-export const globalGravity: number = 0.8;
-export let globalLevelData: { x: number; y: number }[];
 export let globalPlatformY: number;
-export let globalPreviousRenderX: number;
 export let globalRenderX: number;
-export const globalScoreSet: Set<string> = new Set();
+export const globalScoreSet: Set<number> = new Set();
 
 
 export default function Game() {
-
+  let globalAudioIsPlaying: boolean = false;
   let globalAudioBuffer: AudioBuffer;
   let globalAudioColor: string;
   let globalAudioContext: AudioContext;
   let globalAudioHTMLElement: HTMLMediaElement;
-  let globalAudioIsPlaying: boolean = false;
+  let globalCanvas: HTMLCanvasElement;
+  let globalEnemiesPerLevelDisplay: number = 0;
+  let globalEnemyPositionList: { x: number; y: number }[];
   let globalEnemySpawnedList: EnemyObj[] = [];
-  let globalEnemySpawnInterval: number;
-  let globalEnemyTimer = 0;
-  let globalEnemyTimerPausedState = 0;
+  let globalLevelData: { x: number; y: number }[];
   let globalPlayButton: HTMLButtonElement;
   let globalPlayButtonText: HTMLSpanElement;
 
@@ -94,35 +89,34 @@ export default function Game() {
   }
 
   function createLevelData(): void {
-    const audioData = globalAudioBuffer.getChannelData(0);
-    const samplesCount = audioData.length;
-    const levelWidth = globalAudioBuffer.duration * 1000;
-    const levelHeight = globalCanvas.height;
+    const audioData: Float32Array = globalAudioBuffer.getChannelData(0);
+    const samplesCount: number = audioData.length;
+    const levelWidth: number = globalAudioBuffer.duration * 1000;
+    const levelHeight: number = globalCanvas.height;
+    let lastEnemyXPos: number = -300;
 
     globalPlatformY = (globalCanvas.height / 3) * 2
     globalLevelData = [];
     globalEnemyPositionList = [];
 
-    for (let i = 0; i < samplesCount; i += Math.floor(samplesCount / levelWidth)) {
-      const sample = Math.abs(audioData[i]);
-      const posX = (i / samplesCount) * levelWidth;
-      const posY = Math.floor(sample * levelHeight) / 2;
-      if (posY > 200) {
+    for (let i: number = 0; i < samplesCount; i += Math.floor(samplesCount / levelWidth)) {
+      const sample: number = Math.abs(audioData[i]);
+      const posX: number = (i / samplesCount) * levelWidth;
+      const posY: number = Math.floor(sample * levelHeight) / 2;
+      if (posY > 200 && posX > lastEnemyXPos + 400) {
         globalEnemyPositionList.push({ x: posX, y: globalPlatformY - 50 });
+        lastEnemyXPos = posX;
       }
       globalLevelData.push({ x: posX, y: levelHeight - posY });
     }
   }
 
   function startCanvas(): void {
-    globalEnemySpawnInterval = setInterval(() => {
-      globalEnemyTimer++;
-    }, 1000);
-
     const p1InputController: InputController = new InputController();
     const player1: PlayerObj = new PlayerObj(p1InputController);
-
     player1.position.x = globalCanvas.width / 2 - 200;
+
+    preLoadEnemies();
 
     const targetFPS: number = 60;
     const frame_interval: number = 1000 / targetFPS;
@@ -144,7 +138,6 @@ export default function Game() {
     requestAnimationFrame(gameLoop);
 
     function gameLoop(timestamp: number): void {
-      checkEnemySpawn();
       if (globalAudioIsPlaying) {
         deltaTime = timestamp - previousTime;
         deltaTimeMultiplier = deltaTime / frame_interval;
@@ -184,27 +177,37 @@ export default function Game() {
       globalCanvasCtx.beginPath();
       globalCanvasCtx.strokeStyle = globalAudioColor;
       globalCanvasCtx.moveTo(globalLevelData[0].x - globalRenderX, globalLevelData[0].y);
-      for (let i = 1; i < globalLevelData.length; i++) {
+      for (let i: number = 1; i < globalLevelData.length; i++) {
         globalCanvasCtx.lineTo((globalLevelData[i].x - globalRenderX) * deltaTimeMultiplier, globalLevelData[i].y);
       }
       globalCanvasCtx.stroke();
     }
 
-    function checkEnemySpawn(): void {
-      if (!globalAudioIsPlaying) {
-        globalEnemyTimer = globalEnemyTimerPausedState;
-        return;
+    function preLoadEnemies(): void {
+      globalEnemyPositionList.forEach(kvp => {
+        const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50, kvp.x);
+        globalEnemySpawnedList.push(newEnemy);
+      });
+      reduceEnemiesByNThousand(5);
+      const maxEnemyLimit: number = Math.round((globalAudioBuffer.duration / 50) * 75);
+      if (globalEnemySpawnedList.length > maxEnemyLimit) {
+        const numberToRemove: number = globalEnemySpawnedList.length - maxEnemyLimit;
+        const enemyReducer: number = Math.round(globalEnemySpawnedList.length / numberToRemove);
+        for (let i: number = 0; i < globalEnemySpawnedList.length; i = i + enemyReducer) {
+          globalEnemySpawnedList.splice(i, 1);
+        }
+        globalEnemiesPerLevelDisplay = globalEnemySpawnedList.length;
       }
-      globalEnemyTimerPausedState = globalEnemyTimer;
+    }
 
-      if (globalEnemyTimer === 3) {
-        globalEnemyTimer = 0;
-        globalEnemyPositionList.forEach(kvp => {
-          if (kvp.x >= globalRenderX && kvp.x <= globalRenderX + globalCanvas.width) {
-            const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50);
-            globalEnemySpawnedList.push(newEnemy);
-          }
-        });
+    function reduceEnemiesByNThousand(multiplier: number): void {
+      const thousandValue: number = multiplier * 1000
+      if (globalEnemySpawnedList.length > thousandValue) {
+        const reducedEnemySpawnedList: EnemyObj[] = [];
+        for (let i: number = 0; i < globalEnemySpawnedList.length; i = i + multiplier) {
+          reducedEnemySpawnedList.push(globalEnemySpawnedList[i]);
+        }
+        globalEnemySpawnedList = reducedEnemySpawnedList;
       }
     }
 
@@ -218,7 +221,7 @@ export default function Game() {
           enemy.readyForDeletion = true;
         }
         if (enemy.position.x < 0 - enemy.width) {
-          globalScoreSet.add(enemy.id)
+          globalScoreSet.add(enemy.xPositionOnTrack)
           player1.updateScore();
           enemy.readyForDeletion = true;
         }
@@ -259,7 +262,6 @@ export default function Game() {
     function handleLose(): void {
       if (player1.lives <= 0) {
         freezeGame();
-        if (globalEnemySpawnInterval) globalEnemySpawnInterval = 0;
         globalCanvasCtx.fillStyle = "white";
         globalCanvasCtx.font = "40px Audiowide";
         globalCanvasCtx.textAlign = "center";
@@ -280,6 +282,8 @@ export default function Game() {
       globalPlayButtonText.innerText = "Retry Track";
       player1.position.x = globalCanvas.width / 2 - 200;
       player1.reset();
+      globalEnemySpawnedList = [];
+      preLoadEnemies();
       globalRenderX = 0;
       globalAudioHTMLElement.currentTime = 0;
     }
@@ -288,6 +292,7 @@ export default function Game() {
       globalCanvasCtx.fillStyle = "white";
       globalCanvasCtx.font = "20px Audiowide";
       globalCanvasCtx.fillText(`Score: ${player1.score}`, 70, 70);
+      globalCanvasCtx.fillText(`Points Possible: ${globalEnemiesPerLevelDisplay}`, 650, 40);
       if (player1.lives < 2) {
         globalCanvasCtx.fillStyle = "red";
       }
@@ -300,7 +305,6 @@ export default function Game() {
         const progressPercentage: number = globalAudioHTMLElement.currentTime / globalAudioBuffer.duration;
         const audioTimeVis: number = progressPercentage * globalLevelData[globalLevelData.length - 1].x;
         const offsetAudioTime: number = audioTimeVis - visualOffsetInMs;
-        globalPreviousRenderX = globalRenderX;
         globalRenderX = Math.max(offsetAudioTime, 0);
       }
     }

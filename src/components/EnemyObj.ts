@@ -1,21 +1,19 @@
-import { globalCanvasCtx, globalLevelData, globalRenderX, globalPreviousRenderX } from "./GameRendering";
+import { globalCanvasCtx, globalRenderX } from "./GameRendering";
 
 export default class EnemyObj {
-  id: string;
   width: number;
   height: number;
-  moveSpeed: number
   isAlive: boolean;
   readyForDeletion: boolean;
+  xPositionOnTrack: number
   position: { x: number, y: number }
 
-  constructor(spawnX: number, spawnY: number) {
-    this.id = new Date().toLocaleTimeString();
+  constructor(spawnX: number, spawnY: number, xPosOnTrack: number) {
     this.width = 50;
     this.height = 50;
-    this.moveSpeed = 0;
     this.isAlive = true;
     this.readyForDeletion = false;
+    this.xPositionOnTrack = xPosOnTrack
     this.position = {
       x: spawnX,
       y: spawnY
@@ -27,15 +25,12 @@ export default class EnemyObj {
     globalCanvasCtx.fillRect(this.position.x, this.position.y, this.width, this.height);
   }
 
-  updateMoveSpeed(): void {
-    const prevLevelX = (globalPreviousRenderX / globalLevelData.length) * globalLevelData[globalLevelData.length - 1].x;
-    const currentLevelX = (globalRenderX / globalLevelData.length) * globalLevelData[globalLevelData.length - 1].x;
-    this.moveSpeed = (currentLevelX - prevLevelX);
+  updatePosition(deltaTimeMultiplier: number): void {
+    this.position.x = (this.xPositionOnTrack - globalRenderX) * deltaTimeMultiplier;
   }
 
   requestUpdate(deltaTimeMultiplier: number): void {
-    this.updateMoveSpeed();
-    this.position.x -= this.moveSpeed * deltaTimeMultiplier;
+    this.updatePosition(deltaTimeMultiplier);
     if (this.isAlive) {
       this.draw();
     }

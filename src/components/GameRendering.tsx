@@ -19,8 +19,8 @@ export default function Game() {
   let globalCanvas: HTMLCanvasElement;
   let globalEnemyPositionList: { x: number; y: number }[];
   let globalEnemySpawnedList: EnemyObj[] = [];
-  let globalEnemyTimer = 0;
-  let globalEnemyTimerPausedState = 0;
+  let globalEnemyTimer: number = 0;
+  let globalEnemyTimerPausedState: number = 0;
   let globalLevelData: { x: number; y: number }[];
   let globalPlayButton: HTMLButtonElement;
   let globalPlayButtonText: HTMLSpanElement;
@@ -90,21 +90,23 @@ export default function Game() {
   }
 
   function createLevelData(): void {
-    const audioData = globalAudioBuffer.getChannelData(0);
-    const samplesCount = audioData.length;
-    const levelWidth = globalAudioBuffer.duration * 1000;
-    const levelHeight = globalCanvas.height;
+    const audioData: Float32Array = globalAudioBuffer.getChannelData(0);
+    const samplesCount: number = audioData.length;
+    const levelWidth: number = globalAudioBuffer.duration * 1000;
+    const levelHeight: number = globalCanvas.height;
+    let lastEnemyXPos: number = -300;
 
     globalPlatformY = (globalCanvas.height / 3) * 2
     globalLevelData = [];
     globalEnemyPositionList = [];
 
-    for (let i = 0; i < samplesCount; i += Math.floor(samplesCount / levelWidth)) {
-      const sample = Math.abs(audioData[i]);
-      const posX = (i / samplesCount) * levelWidth;
-      const posY = Math.floor(sample * levelHeight) / 2;
-      if (posY > 200) {
+    for (let i: number = 0; i < samplesCount; i += Math.floor(samplesCount / levelWidth)) {
+      const sample: number = Math.abs(audioData[i]);
+      const posX: number = (i / samplesCount) * levelWidth;
+      const posY: number = Math.floor(sample * levelHeight) / 2;
+      if (posY > 200 && posX > lastEnemyXPos + 300) {
         globalEnemyPositionList.push({ x: posX, y: globalPlatformY - 50 });
+        lastEnemyXPos = posX;
       }
       globalLevelData.push({ x: posX, y: levelHeight - posY });
     }
@@ -115,6 +117,7 @@ export default function Game() {
       globalEnemyTimer++;
     }, 1000);
 
+    console.log(globalEnemyPositionList);
     const p1InputController: InputController = new InputController();
     const player1: PlayerObj = new PlayerObj(p1InputController);
 
@@ -182,7 +185,7 @@ export default function Game() {
       globalCanvasCtx.beginPath();
       globalCanvasCtx.strokeStyle = globalAudioColor;
       globalCanvasCtx.moveTo(globalLevelData[0].x - globalRenderX, globalLevelData[0].y);
-      for (let i = 1; i < globalLevelData.length; i++) {
+      for (let i: number = 1; i < globalLevelData.length; i++) {
         globalCanvasCtx.lineTo((globalLevelData[i].x - globalRenderX) * deltaTimeMultiplier, globalLevelData[i].y);
       }
       globalCanvasCtx.stroke();
@@ -206,7 +209,7 @@ export default function Game() {
     }
 
     function reduceEnemiesByNThousand(multiplier: number): void {
-      const thousandValue = multiplier * 1000
+      const thousandValue: number = multiplier * 1000
       if (globalEnemySpawnedList.length > thousandValue) {
         console.log("true: " + globalEnemySpawnedList.length + " is greater than " + thousandValue)
         const reducedEnemySpawnedList: EnemyObj[] = [];
@@ -319,6 +322,7 @@ export default function Game() {
       globalCanvasCtx.fillStyle = "white";
       globalCanvasCtx.font = "20px Audiowide";
       globalCanvasCtx.fillText(`Score: ${player1.score}`, 70, 70);
+      globalCanvasCtx.fillText(`Points Possible: ${globalEnemyPositionList.length}`, 650, 40);
       if (player1.lives < 2) {
         globalCanvasCtx.fillStyle = "red";
       }

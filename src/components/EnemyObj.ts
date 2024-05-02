@@ -25,9 +25,9 @@ export default class EnemyObj {
     const halfHeight = this.height / 2;
     globalCanvasCtx.fillStyle = "red";
     globalCanvasCtx.beginPath();
-    globalCanvasCtx.moveTo(this.position.x, this.position.y + halfHeight);
-    globalCanvasCtx.lineTo(this.position.x + halfWidth, this.position.y - halfHeight);
-    globalCanvasCtx.lineTo(this.position.x + this.width, this.position.y + halfHeight);
+    globalCanvasCtx.moveTo(this.position.x - halfWidth, this.position.y - halfHeight + halfHeight);
+    globalCanvasCtx.lineTo(this.position.x - halfWidth + halfWidth, this.position.y - halfHeight - halfHeight);
+    globalCanvasCtx.lineTo(this.position.x - halfWidth + this.width, this.position.y - halfHeight + halfHeight);
     globalCanvasCtx.closePath();
     globalCanvasCtx.fill();
   }

@@ -1,5 +1,5 @@
 import InputController from "./InputController";
-import { globalCanvasCtx, globalGravity, globalPlatformY, globalScoreSet } from "./GameRendering";
+import { globalCanvasCtx, globalPlatformY, globalScoreSet } from "./GameRendering";
 import spritesheet from "../assets/img/robo_sprite_sheet.png";
 
 const playerSpriteSheet: HTMLImageElement = new Image();
@@ -18,6 +18,7 @@ export default class PlayerObj {
   isGrounded: boolean;
   score: number;
   lives: number;
+  gravity: number;
   isInvincible: boolean;
   position: { x: number, y: number }
   velocity: { y: number }
@@ -31,6 +32,7 @@ export default class PlayerObj {
     this.isGrounded = true;
     this.score = 0;
     this.lives = 3;
+    this.gravity = .8;
     this.isInvincible = false;
     this.position = {
       x: 0,
@@ -76,7 +78,7 @@ export default class PlayerObj {
 
   enforceGravity(deltaTimeMultiplier: number): void {
     this.position.y = this.position.y + this.velocity.y * deltaTimeMultiplier;
-    this.velocity.y = this.velocity.y + globalGravity * deltaTimeMultiplier;
+    this.velocity.y = this.velocity.y + this.gravity * deltaTimeMultiplier;
 
     if (this.position.y + this.height >= globalPlatformY) {
       this.position.y = globalPlatformY - this.height;

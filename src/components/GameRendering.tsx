@@ -104,10 +104,14 @@ export default function Game() {
       const sample: number = Math.abs(audioData[i]);
       const posX: number = (i / samplesCount) * levelWidth;
       const posY: number = Math.floor(sample * levelHeight) / 2;
-      if (posY > 200 && posX > lastEnemyXPos + 300) {
+      if (posY > 200 && posX > lastEnemyXPos + 400) {
         globalEnemyPositionList.push({ x: posX, y: globalPlatformY - 50 });
         lastEnemyXPos = posX;
       }
+      // if (posY > 200) {
+      //   globalEnemyPositionList.push({ x: posX, y: globalPlatformY - 50 });
+      //   lastEnemyXPos = posX;
+      // }
       globalLevelData.push({ x: posX, y: levelHeight - posY });
     }
   }
@@ -116,8 +120,6 @@ export default function Game() {
     setInterval(() => {
       globalEnemyTimer++;
     }, 1000);
-
-    console.log(globalEnemyPositionList);
     const p1InputController: InputController = new InputController();
     const player1: PlayerObj = new PlayerObj(p1InputController);
 
@@ -141,7 +143,7 @@ export default function Game() {
     globalCanvasCtx.textAlign = "center";
     globalCanvasCtx.fillText("Press Play to Start", globalCanvas.width / 2, globalCanvas.height / 2);
 
-    
+
     requestAnimationFrame(gameLoop);
 
     function gameLoop(timestamp: number): void {
@@ -196,15 +198,39 @@ export default function Game() {
         const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50, kvp.x);
         globalEnemySpawnedList.push(newEnemy);
       });
+
+      const maxEnemyLimit: number = Math.round((globalAudioBuffer.duration / 50) * 75);
       
-      reduceEnemiesByNThousand(10);
+      // reduceEnemiesByNThousand(10);
       reduceEnemiesByNThousand(5);
-      reduceEnemiesByNThousand(2);
+      // reduceEnemiesByNThousand(2);
+
+      if (globalEnemySpawnedList.length > maxEnemyLimit) {
+        console.log("This needs to be reduced! Enemy limit for this track is " + maxEnemyLimit + ", but " + globalEnemySpawnedList.length + " were generated!")
+        const numberToRemove: number = globalEnemySpawnedList.length - maxEnemyLimit;
+        const enemyReducer: number = Math.round(globalEnemySpawnedList.length / numberToRemove);
+        console.log("Reducing by " + enemyReducer);
+        console.log(numberToRemove)
+        // const reducedEnemySpawnedList: EnemyObj[] = [];
+        for (let i: number = 0; i < globalEnemySpawnedList.length; i = i + enemyReducer) {
+          globalEnemySpawnedList.splice(i, 1);
+          // reducedEnemySpawnedList.push();
+        }
+        // globalEnemySpawnedList = reducedEnemySpawnedList;
+
+        
+      } else {
+        console.log("All good! Enemy limit for this track is " + maxEnemyLimit + ", and only " + globalEnemySpawnedList.length + " were generated")
+      }
       
+
+
       
-      
-      
-      
+
+
+
+
+
       console.log("Final enemy count: " + globalEnemySpawnedList.length)
     }
 

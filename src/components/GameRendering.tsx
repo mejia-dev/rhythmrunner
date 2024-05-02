@@ -196,8 +196,8 @@ export default function Game() {
         for (let i: number = 0; i < globalEnemySpawnedList.length; i = i + enemyReducer) {
           globalEnemySpawnedList.splice(i, 1);
         }
-        globalEnemiesPerLevelDisplay = globalEnemySpawnedList.length;
       }
+      globalEnemiesPerLevelDisplay = globalEnemySpawnedList.length;
     }
 
     function reduceEnemiesByNThousand(multiplier: number): void {

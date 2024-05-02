@@ -21,7 +21,6 @@ export default function Game() {
   let globalEnemyPositionList: { x: number; y: number }[];
   let globalEnemySpawnedList: EnemyObj[] = [];
   let globalEnemyTimer: number = 0;
-  let globalEnemyTimerPausedState: number = 0;
   let globalLevelData: { x: number; y: number }[];
   let globalPlayButton: HTMLButtonElement;
   let globalPlayButtonText: HTMLSpanElement;
@@ -109,10 +108,6 @@ export default function Game() {
         globalEnemyPositionList.push({ x: posX, y: globalPlatformY - 50 });
         lastEnemyXPos = posX;
       }
-      // if (posY > 200) {
-      //   globalEnemyPositionList.push({ x: posX, y: globalPlatformY - 50 });
-      //   lastEnemyXPos = posX;
-      // }
       globalLevelData.push({ x: posX, y: levelHeight - posY });
     }
   }
@@ -144,11 +139,9 @@ export default function Game() {
     globalCanvasCtx.textAlign = "center";
     globalCanvasCtx.fillText("Press Play to Start", globalCanvas.width / 2, globalCanvas.height / 2);
 
-
     requestAnimationFrame(gameLoop);
 
     function gameLoop(timestamp: number): void {
-      // checkEnemySpawn();
       if (globalAudioIsPlaying) {
         deltaTime = timestamp - previousTime;
         deltaTimeMultiplier = deltaTime / frame_interval;
@@ -199,72 +192,27 @@ export default function Game() {
         const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50, kvp.x);
         globalEnemySpawnedList.push(newEnemy);
       });
-
-      const maxEnemyLimit: number = Math.round((globalAudioBuffer.duration / 50) * 75);
-      
-      // reduceEnemiesByNThousand(10);
       reduceEnemiesByNThousand(5);
-      // reduceEnemiesByNThousand(2);
-
+      const maxEnemyLimit: number = Math.round((globalAudioBuffer.duration / 50) * 75);
       if (globalEnemySpawnedList.length > maxEnemyLimit) {
-        console.log("This needs to be reduced! Enemy limit for this track is " + maxEnemyLimit + ", but " + globalEnemySpawnedList.length + " were generated!")
         const numberToRemove: number = globalEnemySpawnedList.length - maxEnemyLimit;
         const enemyReducer: number = Math.round(globalEnemySpawnedList.length / numberToRemove);
-        console.log("Reducing by " + enemyReducer);
-        console.log(numberToRemove)
-        // const reducedEnemySpawnedList: EnemyObj[] = [];
         for (let i: number = 0; i < globalEnemySpawnedList.length; i = i + enemyReducer) {
           globalEnemySpawnedList.splice(i, 1);
-          // reducedEnemySpawnedList.push();
         }
         globalEnemiesPerLevelDisplay = globalEnemySpawnedList.length;
-
-        
-      } else {
-        console.log("All good! Enemy limit for this track is " + maxEnemyLimit + ", and only " + globalEnemySpawnedList.length + " were generated")
       }
-      
-
-
-      
-
-
-
-
-
-      console.log("Final enemy count: " + globalEnemySpawnedList.length)
     }
 
     function reduceEnemiesByNThousand(multiplier: number): void {
       const thousandValue: number = multiplier * 1000
       if (globalEnemySpawnedList.length > thousandValue) {
-        console.log("true: " + globalEnemySpawnedList.length + " is greater than " + thousandValue)
         const reducedEnemySpawnedList: EnemyObj[] = [];
         for (let i: number = 0; i < globalEnemySpawnedList.length; i = i + multiplier) {
           reducedEnemySpawnedList.push(globalEnemySpawnedList[i]);
         }
-        console.log(multiplier + "th-reduced Enemies: " + reducedEnemySpawnedList.length)
         globalEnemySpawnedList = reducedEnemySpawnedList;
       }
-    }
-
-    function checkEnemySpawn(): void {
-      if (!globalAudioIsPlaying) {
-        globalEnemyTimer = globalEnemyTimerPausedState;
-        return;
-      }
-      globalEnemyTimerPausedState = globalEnemyTimer;
-      // if (globalEnemyTimer === 3) {
-      //   globalEnemyTimer = 0;
-      globalEnemyPositionList.forEach(kvp => {
-        if (kvp.x >= globalRenderX && kvp.x <= globalRenderX + globalCanvas.width && !globalEnemySpawnedList.some((enemy: EnemyObj) => enemy.xPositionOnTrack != kvp.x)) {
-          const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50, kvp.x);
-
-          globalEnemySpawnedList.push(newEnemy);
-
-        }
-      });
-      // }
     }
 
     function updateSpawnedEnemies(deltaTimeMultiplier: number): void {
@@ -340,7 +288,6 @@ export default function Game() {
       player1.reset();
       globalEnemySpawnedList = [];
       preLoadEnemies();
-      globalEnemyTimerPausedState = 0;
       globalRenderX = 0;
       globalAudioHTMLElement.currentTime = 0;
     }

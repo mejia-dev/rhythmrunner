@@ -185,7 +185,7 @@ export default function Game() {
 
     function preLoadEnemies(): void {
       globalEnemyPositionList.forEach(kvp => {
-        const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50, kvp.x);
+        const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY, kvp.x);
         globalEnemySpawnedList.push(newEnemy);
       });
       reduceEnemiesByNThousand(5);

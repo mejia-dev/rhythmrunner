@@ -17,6 +17,7 @@ export default function Game() {
   let globalAudioContext: AudioContext;
   let globalAudioHTMLElement: HTMLMediaElement;
   let globalCanvas: HTMLCanvasElement;
+  let globalEnemiesPerLevelDisplay: number = 0;
   let globalEnemyPositionList: { x: number; y: number }[];
   let globalEnemySpawnedList: EnemyObj[] = [];
   let globalEnemyTimer: number = 0;
@@ -216,7 +217,7 @@ export default function Game() {
           globalEnemySpawnedList.splice(i, 1);
           // reducedEnemySpawnedList.push();
         }
-        // globalEnemySpawnedList = reducedEnemySpawnedList;
+        globalEnemiesPerLevelDisplay = globalEnemySpawnedList.length;
 
         
       } else {
@@ -348,7 +349,7 @@ export default function Game() {
       globalCanvasCtx.fillStyle = "white";
       globalCanvasCtx.font = "20px Audiowide";
       globalCanvasCtx.fillText(`Score: ${player1.score}`, 70, 70);
-      globalCanvasCtx.fillText(`Points Possible: ${globalEnemyPositionList.length}`, 650, 40);
+      globalCanvasCtx.fillText(`Points Possible: ${globalEnemiesPerLevelDisplay}`, 650, 40);
       if (player1.lives < 2) {
         globalCanvasCtx.fillStyle = "red";
       }

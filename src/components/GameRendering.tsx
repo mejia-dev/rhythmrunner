@@ -5,7 +5,6 @@ import { ChangeEvent, useState } from "react";
 import deathSound from "../assets/audio/492651__rvgerxini__power-down.mp3";
 
 export let globalCanvasCtx: CanvasRenderingContext2D;
-export const globalGravity: number = 1.5;
 export let globalPlatformY: number;
 export let globalRenderX: number;
 export const globalScoreSet: Set<number> = new Set();

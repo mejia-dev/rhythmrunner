@@ -185,7 +185,7 @@ export default function Game() {
 
     function preLoadEnemies(): void {
       globalEnemyPositionList.forEach(kvp => {
-        const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50, kvp.x);
+        const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY, kvp.x);
         globalEnemySpawnedList.push(newEnemy);
       });
       reduceEnemiesByNThousand(5);
@@ -196,8 +196,8 @@ export default function Game() {
         for (let i: number = 0; i < globalEnemySpawnedList.length; i = i + enemyReducer) {
           globalEnemySpawnedList.splice(i, 1);
         }
-        globalEnemiesPerLevelDisplay = globalEnemySpawnedList.length;
       }
+      globalEnemiesPerLevelDisplay = globalEnemySpawnedList.length;
     }
 
     function reduceEnemiesByNThousand(multiplier: number): void {

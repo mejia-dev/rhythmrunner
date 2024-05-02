@@ -3,6 +3,7 @@ import InputController from "./InputController";
 import EnemyObj from "./EnemyObj";
 import { ChangeEvent, useState } from "react";
 import deathSound from "../assets/audio/492651__rvgerxini__power-down.mp3";
+import GameInfo from "./GameInfo";
 
 export let globalCanvasCtx: CanvasRenderingContext2D;
 export let globalPlatformY: number;
@@ -25,6 +26,7 @@ export default function Game() {
   let globalPlayButtonText: HTMLSpanElement;
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [gameInfoScreenVisible, setGameInfoScreenVisible] = useState<boolean>(false);
 
   function handleAudioUpload(event: Event | ChangeEvent): void {
     setLoading(true);
@@ -312,6 +314,7 @@ export default function Game() {
 
   return (
     <>
+      <button id="infoButton" onClick={() => setGameInfoScreenVisible(!gameInfoScreenVisible)}>?</button>
       <h1 id="logoText">Rhythm Runner</h1>
       <hr />
       <br />
@@ -323,6 +326,7 @@ export default function Game() {
           id="audioFile"
           onChange={handleAudioUpload}
         />
+        
         <audio id="audioSource" />
       </div>
 

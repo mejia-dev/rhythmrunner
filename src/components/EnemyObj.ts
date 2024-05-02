@@ -21,8 +21,15 @@ export default class EnemyObj {
   }
 
   draw() {
+    const halfWidth = this.width / 2;
+    const halfHeight = this.height / 2;
     globalCanvasCtx.fillStyle = "red";
-    globalCanvasCtx.fillRect(this.position.x, this.position.y, this.width, this.height);
+    globalCanvasCtx.beginPath();
+    globalCanvasCtx.moveTo(this.position.x, this.position.y + halfHeight);
+    globalCanvasCtx.lineTo(this.position.x + halfWidth, this.position.y - halfHeight);
+    globalCanvasCtx.lineTo(this.position.x + this.width, this.position.y + halfHeight);
+    globalCanvasCtx.closePath();
+    globalCanvasCtx.fill();
   }
 
   updatePosition(deltaTimeMultiplier: number): void {

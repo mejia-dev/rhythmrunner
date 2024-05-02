@@ -20,7 +20,6 @@ export default function Game() {
   let globalEnemiesPerLevelDisplay: number = 0;
   let globalEnemyPositionList: { x: number; y: number }[];
   let globalEnemySpawnedList: EnemyObj[] = [];
-  let globalEnemyTimer: number = 0;
   let globalLevelData: { x: number; y: number }[];
   let globalPlayButton: HTMLButtonElement;
   let globalPlayButtonText: HTMLSpanElement;
@@ -113,13 +112,10 @@ export default function Game() {
   }
 
   function startCanvas(): void {
-    setInterval(() => {
-      globalEnemyTimer++;
-    }, 1000);
     const p1InputController: InputController = new InputController();
     const player1: PlayerObj = new PlayerObj(p1InputController);
-
     player1.position.x = globalCanvas.width / 2 - 200;
+
     preLoadEnemies();
 
     const targetFPS: number = 60;

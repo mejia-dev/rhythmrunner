@@ -32,7 +32,7 @@ export default class PlayerObj {
     this.isGrounded = true;
     this.score = 0;
     this.lives = 3;
-    this.gravity = .8;
+    this.gravity = 1.3;
     this.isInvincible = false;
     this.position = {
       x: 0,

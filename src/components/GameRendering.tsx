@@ -5,7 +5,7 @@ import { ChangeEvent, useState } from "react";
 import deathSound from "../assets/audio/492651__rvgerxini__power-down.mp3";
 
 export let globalCanvasCtx: CanvasRenderingContext2D;
-export const globalGravity: number = 0.8;
+export const globalGravity: number = 1.5;
 export let globalPlatformY: number;
 export let globalRenderX: number;
 export const globalScoreSet: Set<number> = new Set();
@@ -120,6 +120,7 @@ export default function Game() {
     const player1: PlayerObj = new PlayerObj(p1InputController);
 
     player1.position.x = globalCanvas.width / 2 - 200;
+    preLoadEnemies();
 
     const targetFPS: number = 60;
     const frame_interval: number = 1000 / targetFPS;
@@ -138,7 +139,7 @@ export default function Game() {
     globalCanvasCtx.textAlign = "center";
     globalCanvasCtx.fillText("Press Play to Start", globalCanvas.width / 2, globalCanvas.height / 2);
 
-    preLoadEnemies();
+    
     requestAnimationFrame(gameLoop);
 
     function gameLoop(timestamp: number): void {
@@ -189,18 +190,33 @@ export default function Game() {
     }
 
     function preLoadEnemies(): void {
-      const reducedEnemySpawnedList: EnemyObj[] = [];
       globalEnemyPositionList.forEach(kvp => {
         const newEnemy = new EnemyObj(globalCanvas.width, globalPlatformY - 50, kvp.x);
         globalEnemySpawnedList.push(newEnemy);
       });
-      // if (globalEnemySpawnedList.length > 10000) {
-      //   const nthElement: number = Math.floor(globalEnemySpawnedList.length / 10)
-      //   for (let i: number = 0; i < globalEnemySpawnedList.length; i = i + nthElement) {
-      //     reducedEnemySpawnedList.push(globalEnemySpawnedList[i]);
-      //   }
-      //   globalEnemySpawnedList = reducedEnemySpawnedList;
-      // }
+      
+      reduceEnemiesByNThousand(10);
+      reduceEnemiesByNThousand(5);
+      reduceEnemiesByNThousand(2);
+      
+      
+      
+      
+      
+      console.log("Final enemy count: " + globalEnemySpawnedList.length)
+    }
+
+    function reduceEnemiesByNThousand(multiplier: number): void {
+      const thousandValue = multiplier * 1000
+      if (globalEnemySpawnedList.length > thousandValue) {
+        console.log("true: " + globalEnemySpawnedList.length + " is greater than " + thousandValue)
+        const reducedEnemySpawnedList: EnemyObj[] = [];
+        for (let i: number = 0; i < globalEnemySpawnedList.length; i = i + multiplier) {
+          reducedEnemySpawnedList.push(globalEnemySpawnedList[i]);
+        }
+        console.log(multiplier + "th-reduced Enemies: " + reducedEnemySpawnedList.length)
+        globalEnemySpawnedList = reducedEnemySpawnedList;
+      }
     }
 
     function checkEnemySpawn(): void {
@@ -224,17 +240,9 @@ export default function Game() {
 
     function updateSpawnedEnemies(deltaTimeMultiplier: number): void {
       globalEnemySpawnedList = globalEnemySpawnedList.filter(enemy => !enemy.readyForDeletion);
-      // console.log(globalEnemySpawnedList)
-      console.log("this list")
-      console.log(globalEnemySpawnedList);
       globalEnemySpawnedList.forEach(enemy => {
         enemy.requestUpdate(deltaTimeMultiplier);
         if (checkCollision(player1, enemy)) {
-          console.log("hurt!")
-          // removeDuplicateEnemies();
-          console.log(globalEnemySpawnedList)
-          console.log(enemy)
-
           player1.takeDamage(1);
           enemy.isAlive = false;
           enemy.readyForDeletion = true;
@@ -301,6 +309,8 @@ export default function Game() {
       globalPlayButtonText.innerText = "Retry Track";
       player1.position.x = globalCanvas.width / 2 - 200;
       player1.reset();
+      globalEnemySpawnedList = [];
+      preLoadEnemies();
       globalEnemyTimerPausedState = 0;
       globalRenderX = 0;
       globalAudioHTMLElement.currentTime = 0;

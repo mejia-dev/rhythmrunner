@@ -1,5 +1,8 @@
-<img align="center" src="./src/assets/img/rr-logo.png" />
-<h4 align="center">Music-based platformer game.</h4>
+<p align="center">
+  <img src="./src/assets/img/rr-logo.png" />
+  <br/>
+  Music-based platformer game.
+</p>
 <hr />
 <h3 align="center"><a href="https://mejia.dev/rhythmrunner" target="_blank">Click to Play!</a></h3>
 
@@ -11,7 +14,7 @@ This game was developed in vanilla TypeScript using no external libraries or tec
 
 
 ## 🎮 Controls
-- **W / SPACE / UP Arrow**: Jump
+- **W / SPACE / UP Arrow**: Jump / Double-Jump
 
 
 ## 💻 Technologies Used
@@ -74,6 +77,7 @@ The development of this game happened in 120 hours of Epicodus class time. Below
 
 ## ⚠️ Known Bugs
 If you see an issue, please report it on the [Issues](https://github.com/mejia-dev/rhythmrunner/issues) page.
+- Line 31 of `GameRendering.tsx` uses an `any` variable declaration.
 - Player falls back to ground very quickly after resuming from pause.
 - Player invincibility glow can stay active after the track is restarted.
 - Audio tracks with consistent/ambient low frequencies can cause visualizer and rendering to become glitchy.

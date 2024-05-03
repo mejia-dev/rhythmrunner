@@ -28,6 +28,12 @@ export default function Game() {
   const [loading, setLoading] = useState<boolean>(false);
   const [gameInfoScreenVisible, setGameInfoScreenVisible] = useState<boolean>(false);
 
+  if (gameInfoScreenVisible) {
+    document.getElementById("infoButton")?.classList.add("active");
+  } else {
+    document.getElementById("infoButton")?.classList.remove("active");
+  }
+
   function handleAudioUpload(event: Event | ChangeEvent): void {
     setLoading(true);
     const blob: any = window.URL || window.webkitURL;
@@ -315,6 +321,9 @@ export default function Game() {
   return (
     <>
       <button id="infoButton" onClick={() => setGameInfoScreenVisible(!gameInfoScreenVisible)}>?</button>
+
+      {gameInfoScreenVisible && (<GameInfo />)}
+      
       <h1 id="logoText">Rhythm Runner</h1>
       <hr />
       <br />
@@ -326,7 +335,7 @@ export default function Game() {
           id="audioFile"
           onChange={handleAudioUpload}
         />
-        
+
         <audio id="audioSource" />
       </div>
 
@@ -347,6 +356,7 @@ export default function Game() {
 
 
       <canvas id="playArea" width="800" height="600" tabIndex={0} />
+
     </>
   )
 }

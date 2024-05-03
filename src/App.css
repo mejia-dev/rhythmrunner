@@ -14,8 +14,11 @@
 
 h1,
 h2,
+h3,
+li,
 p,
-span {
+span 
+{
   font-family: 'Audiowide', sans-serif;
 }
 
@@ -46,4 +49,28 @@ canvas:focus {
     0 0 220px rgb(0, 255, 128),
     0 0 320px rgb(0, 255, 128);
   transition: 500ms;
+}
+
+#howTo-Screenshots {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.howTo-singleScreenshot {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 10px;
+  border-style: outset;
+  border-width: 1px;
+}
+
+#devInfo {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }

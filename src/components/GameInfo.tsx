@@ -31,9 +31,9 @@ export default function GameInfo() {
         </div>
         <hr />
       </div>
-      <div>
-        <h2>Developer Info</h2>
-        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Reiciendis suscipit consequatur velit, cum neque magnam impedit officiis voluptates vero quas quia laborum esse eaque quos, sequi aspernatur aliquam sapiente quod.</p>
+      <div id="devInfo">
+        <p>Copyright (c) 2024 Aaron Mejia.</p>
+        <p>View the <a href="https://github.com/mejia-dev/rhythmrunner" target="_blank">GitHub repository</a>.</p>
       </div>
     </div>
   )

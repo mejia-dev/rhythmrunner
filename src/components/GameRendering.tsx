@@ -3,6 +3,7 @@ import InputController from "./InputController";
 import EnemyObj from "./EnemyObj";
 import { ChangeEvent, useState } from "react";
 import deathSound from "../assets/audio/492651__rvgerxini__power-down.mp3";
+import Modal, { Styles } from "react-modal";
 import GameInfo from "./GameInfo";
 
 export let globalCanvasCtx: CanvasRenderingContext2D;
@@ -10,6 +11,19 @@ export let globalPlatformY: number;
 export let globalRenderX: number;
 export const globalScoreSet: Set<number> = new Set();
 
+const modalStyling: Styles = {
+  content: {
+    top: '10%',
+    left: '5%',
+    right: '5%',
+    bottom: '10%',
+    backgroundColor: "#242424",
+    borderRadius: '10px'
+  },
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)'
+  }
+}
 
 export default function Game() {
   let globalAudioIsPlaying: boolean = false;
@@ -322,7 +336,16 @@ export default function Game() {
     <>
       <button id="infoButton" onClick={() => setGameInfoScreenVisible(!gameInfoScreenVisible)}>?</button>
 
-      {gameInfoScreenVisible && (<GameInfo />)}
+      {gameInfoScreenVisible && (
+        <Modal
+          isOpen={gameInfoScreenVisible}
+          onRequestClose={() => setGameInfoScreenVisible(false)}
+          contentLabel="Game Information"
+          style={modalStyling}
+        >
+          <GameInfo />
+        </Modal>
+      )}
       
       <h1 id="logoText">Rhythm Runner</h1>
       <hr />

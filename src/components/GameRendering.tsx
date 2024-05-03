@@ -42,6 +42,9 @@ export default function Game() {
   const [loading, setLoading] = useState<boolean>(false);
   const [gameInfoScreenVisible, setGameInfoScreenVisible] = useState<boolean>(false);
 
+  const mainGameContent: HTMLElement = document.getElementById("mainGameContent") as HTMLElement;
+  Modal.setAppElement(mainGameContent);
+
   if (gameInfoScreenVisible) {
     document.getElementById("infoButton")?.classList.add("active");
   } else {
@@ -333,7 +336,7 @@ export default function Game() {
   }
 
   return (
-    <>
+    <div id="mainGameContent">
       <button id="infoButton" onClick={() => setGameInfoScreenVisible(!gameInfoScreenVisible)}>?</button>
 
       {gameInfoScreenVisible && (
@@ -380,6 +383,6 @@ export default function Game() {
 
       <canvas id="playArea" width="800" height="600" tabIndex={0} />
 
-    </>
+    </div>
   )
 }

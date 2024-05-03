@@ -3,12 +3,27 @@ import InputController from "./InputController";
 import EnemyObj from "./EnemyObj";
 import { ChangeEvent, useState } from "react";
 import deathSound from "../assets/audio/492651__rvgerxini__power-down.mp3";
+import Modal, { Styles } from "react-modal";
+import GameInfo from "./GameInfo";
 
 export let globalCanvasCtx: CanvasRenderingContext2D;
 export let globalPlatformY: number;
 export let globalRenderX: number;
 export const globalScoreSet: Set<number> = new Set();
 
+const modalStyling: Styles = {
+  content: {
+    top: '10%',
+    left: '5%',
+    right: '5%',
+    bottom: '10%',
+    backgroundColor: "#242424",
+    borderRadius: '10px'
+  },
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)'
+  }
+}
 
 export default function Game() {
   let globalAudioIsPlaying: boolean = false;
@@ -25,6 +40,16 @@ export default function Game() {
   let globalPlayButtonText: HTMLSpanElement;
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [gameInfoScreenVisible, setGameInfoScreenVisible] = useState<boolean>(false);
+
+  const mainGameContent: HTMLElement = document.getElementById("mainGameContent") as HTMLElement;
+  Modal.setAppElement(mainGameContent);
+
+  if (gameInfoScreenVisible) {
+    document.getElementById("infoButton")?.classList.add("active");
+  } else {
+    document.getElementById("infoButton")?.classList.remove("active");
+  }
 
   function handleAudioUpload(event: Event | ChangeEvent): void {
     setLoading(true);
@@ -311,7 +336,20 @@ export default function Game() {
   }
 
   return (
-    <>
+    <div id="mainGameContent">
+      <button id="infoButton" onClick={() => setGameInfoScreenVisible(!gameInfoScreenVisible)}>?</button>
+
+      {gameInfoScreenVisible && (
+        <Modal
+          isOpen={gameInfoScreenVisible}
+          onRequestClose={() => setGameInfoScreenVisible(false)}
+          contentLabel="Game Information"
+          style={modalStyling}
+        >
+          <GameInfo />
+        </Modal>
+      )}
+      
       <h1 id="logoText">Rhythm Runner</h1>
       <hr />
       <br />
@@ -323,6 +361,7 @@ export default function Game() {
           id="audioFile"
           onChange={handleAudioUpload}
         />
+
         <audio id="audioSource" />
       </div>
 
@@ -343,6 +382,7 @@ export default function Game() {
 
 
       <canvas id="playArea" width="800" height="600" tabIndex={0} />
-    </>
+
+    </div>
   )
 }

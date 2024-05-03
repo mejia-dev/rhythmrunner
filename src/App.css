@@ -1,4 +1,5 @@
 @import url('https://fonts.cdnfonts.com/css/audiowide');
+
 @font-face {
   font-family: 'Audiowide';
   src: url('https://fonts.cdnfonts.com/s/15406/Audiowide-Regular.woff');
@@ -11,7 +12,13 @@
   text-align: center;
 }
 
-h1, p, span {
+h1,
+h2,
+h3,
+li,
+p,
+span 
+{
   font-family: 'Audiowide', sans-serif;
 }
 
@@ -21,4 +28,49 @@ h1, p, span {
 
 canvas:focus {
   outline: none;
+}
+
+#infoButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 5rem;
+  height: 5rem;
+  font-size: x-large;
+}
+
+#infoButton.active {
+  color: rgb(0, 255, 128);
+  box-shadow: 0 0 20px rgb(0, 255, 128),
+    0 0 40px rgb(0, 255, 128),
+    0 0 60px rgb(0, 255, 128),
+    0 0 80px rgb(0, 255, 128),
+    0 0 120px rgb(0, 255, 128),
+    0 0 220px rgb(0, 255, 128),
+    0 0 320px rgb(0, 255, 128);
+  transition: 500ms;
+}
+
+#howTo-Screenshots {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.howTo-singleScreenshot {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 10px;
+  border-style: outset;
+  border-width: 1px;
+}
+
+#devInfo {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }

@@ -38,11 +38,11 @@ canvas:focus {
 #infoButton.active {
   color: rgb(0, 255, 128);
   box-shadow: 0 0 20px rgb(0, 255, 128),
-    0 0 40px rgb(127, 153, 127),
-    0 0 60px rgb(127, 153, 127),
-    0 0 80px rgb(127, 153, 127),
-    0 0 120px rgb(127, 153, 127),
-    0 0 220px rgb(127, 153, 127),
-    0 0 320px rgb(127, 153, 127);
-  transition: 2ms;
+    0 0 40px rgb(0, 255, 128),
+    0 0 60px rgb(0, 255, 128),
+    0 0 80px rgb(0, 255, 128),
+    0 0 120px rgb(0, 255, 128),
+    0 0 220px rgb(0, 255, 128),
+    0 0 320px rgb(0, 255, 128);
+  transition: 500ms;
 }

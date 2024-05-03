@@ -32,6 +32,7 @@ canvas:focus {
   right: 10px;
   width: 5rem;
   height: 5rem;
+  font-size: x-large;
 }
 
 #infoButton.active {

@@ -4,7 +4,7 @@
   Music-based platformer game.
 </p>
 <hr />
-<h3 align="center"><a href="https://mejia.dev/rhythmrunner" target="_blank">Click to Play!</a></h3>
+<h3 align="center"><a href="https://mejia.dev/rhythm-runner/" target="_blank">Click to Play!</a></h3>
 
 
 ## ❔ Description

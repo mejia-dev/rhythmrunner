@@ -4,13 +4,15 @@
   Music-based platformer game.
 </p>
 <hr />
-<h3 align="center"><a href="https://mejia.dev/rhythmrunner" target="_blank">Click to Play!</a></h3>
+<h3 align="center"><a href="https://mejia.dev/rhythm-runner/" target="_blank">Click to Play!</a></h3>
 
 
 ## ❔ Description
+Upload an audio file, then run through a level generated directly from the audio data while dodging obstacles in your way!
+
 This game was developed in vanilla TypeScript using no external libraries or technologies (outside of React for page rendering). This was created as my capstone project for Epicodus. I was inspired to create a project that combined my passion for game design with my passion for music. For more information, see the Development Log section below.
 
-**Your objective**: Upload an audio file, then run through a level generated directly from the audio data while dodging obstacles in your way!
+**Note**: Chromium-based browsers (Chrome, Edge, Brave, etc.) are recommended. Game does not behave consistently in Firefox.
 
 
 ## 🎮 Controls

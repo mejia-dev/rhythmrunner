@@ -91,5 +91,5 @@ Please open an [Issue](https://github.com/mejia-dev/rhythmrunner/issues) to leav
 
 ## ⚖️ License
 
-Copyright (C) 2024 Aaron Mejia<br />
+Copyright (C) 2024-2026 Aaron Mejia<br />
 Open Source under the [GPLv3 License](./LICENSE.txt).

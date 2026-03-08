@@ -1,0 +1,28 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Content Security Policy (CSP)
+  Header set Content-Security-Policy "default-src 'self'; font-src 'self' https://fonts.cdnfonts.com;"
+
+  # Enforce HTTPS
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+  # Prevent browsers from incorrectly guessing content types
+  Header set X-Content-Type-Options "nosniff"
+
+  # Prevent reflective XSS attacks (for older browsers)
+  Header set X-XSS-Protection "1; mode=block"
+
+  # Control how much referrer information is sent
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Restrict browser features to only what's needed
+  Header set Permissions-Policy "accelerometer=(), ambient-light-sensor=(), autoplay=(self), battery=(), camera=(), display-capture=(), document-domain=(), encrypted-media=(self), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(self), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()"
+</IfModule>

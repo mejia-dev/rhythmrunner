@@ -29,12 +29,12 @@ export default function GameInfo() {
             <span>If the player has more than one life, a three-second invincibility perk is gained after hitting an enemy.</span>
           </div>
         </div>
-        <hr />
+        {/* <hr /> */}
       </div>
-      <div id="devInfo">
+      {/* <div id="devInfo">
         <p>Copyright (c) 2024 Aaron Mejia.</p>
         <p>View the <a href="https://github.com/mejia-dev/rhythmrunner" target="_blank">GitHub repository</a>.</p>
-      </div>
+      </div> */}
     </div>
   )
 }

@@ -9,7 +9,7 @@
 
 <IfModule mod_headers.c>
   # Content Security Policy (CSP)
-  Header set Content-Security-Policy "default-src 'self'; font-src 'self' https://fonts.cdnfonts.com;"
+  Header set Content-Security-Policy "default-src 'self'; font-src 'self' https://fonts.cdnfonts.com; style-src-elem 'self' https://fonts.cdnfonts.com; media-src 'self' blob:;"
 
   # Enforce HTTPS
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"

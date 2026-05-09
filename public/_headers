@@ -1,0 +1,7 @@
+/*
+  Content-Security-Policy: default-src 'none'; font-src 'self' https://fonts.cdnfonts.com; style-src-elem 'self' https://fonts.cdnfonts.com; media-src 'self' blob:; frame-ancestors 'none'; script-src 'self' static.cloudflareinsights.com; img-src 'self'; connect-src 'self';
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), ambient-light-sensor=(), autoplay=(self), battery=(), camera=(), display-capture=(), document-domain=(), encrypted-media=(self), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(self), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()
